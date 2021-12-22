@@ -1,0 +1,5 @@
+enum PlayerSide {
+    COMPUTER,
+    HUMAN
+}
+
