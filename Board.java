@@ -1,6 +1,6 @@
 import java.util.*;
 public class Board {
-    Square[][] board;
+    private Square[][] board;
     private int dimension;
 
     /**
@@ -61,6 +61,23 @@ public class Board {
 
     }
 
+    public Board(Board copyBoard) {
+        board = new Square[8][8];
+
+        for(int i = 0; i < 8; i++) {
+
+            for(int j = 0; j < 8; j++) {
+                if(copyBoard.getBoard()[i][j].getPiece() != null)
+                    board[i][j] = new Square(copyBoard.getBoard()[i][j]);
+                else board[i][j] = new Square(i, j);
+            }
+        }
+    }
+
+    public Square[][] getBoard() {
+        return this.board;
+    }
+
     public void standardMove(Piece cur_piece, Direction moveDirection) {
 
         board[cur_piece.getRow()][cur_piece.getCol()].removePiece();
@@ -82,6 +99,118 @@ public class Board {
 
         board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
 
+    }
+
+    public void jumpMove(Piece cur_piece, Direction moveDirection) {
+        board[cur_piece.getRow()][cur_piece.getCol()].removePiece();
+
+        switch(moveDirection) {
+            case UPRIGHT:
+                cur_piece.setPos(cur_piece.getRow() - 2, cur_piece.getCol() + 2);
+                break;
+            case UPLEFT:
+                cur_piece.setPos(cur_piece.getRow() - 2, cur_piece.getCol() - 2);
+                break;
+            case DOWNLEFT:
+                cur_piece.setPos(cur_piece.getRow() + 2, cur_piece.getCol() - 2);
+                break;
+            case DOWNRIGHT:
+                cur_piece.setPos(cur_piece.getRow() + 2, cur_piece.getCol() + 2);
+                break;         
+
+        }
+
+        board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
+
+    }
+
+    /**
+     * This method checks if the piece can do a standard move given its current position
+     * and the given direction
+     * @param cur_piece reference to the piece in the board
+     * @param moveDirection the direction being checked
+     * @return true if it can do a standard move, false otherwise
+     */
+    public boolean checkStandardMove(Piece cur_piece, Direction moveDirection) {
+
+        switch(moveDirection) {
+            case UPLEFT:
+                if(cur_piece.getRow() - 1 >= 0 && cur_piece.getCol() - 1 >= 0
+                && board[cur_piece.getRow() - 1][cur_piece.getCol() - 1].getPiece() == null)
+                    return true;
+                    break;
+            case UPRIGHT:
+                if(cur_piece.getRow() - 1 >= 0 && cur_piece.getCol() + 1 <= 7
+                && board[cur_piece.getRow() - 1][cur_piece.getCol() + 1].getPiece() == null)
+                    return true;
+                    break;
+
+            case DOWNRIGHT:
+                if(cur_piece.getRow() + 1 <= 7 && cur_piece.getCol() + 1 <= 7
+                && board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].getPiece() == null)
+                    return true;
+                    break;
+
+            case DOWNLEFT:
+                if(cur_piece.getRow() + 1 <= 7 && cur_piece.getCol() - 1 >= 0
+                && board[cur_piece.getRow() + 1][cur_piece.getCol() - 1].getPiece() == null)
+                    return true;
+                    break;
+            
+            default: return false;
+                
+        }
+
+        return false;
+    }
+
+    public boolean checkJumpMove(Piece cur_piece, Direction moveDirection) {
+
+        /*If it is not out of bonds and if there is no piece and if the piece that is jumped over
+          is an enemy piece, then a jump move on this piece is valid */
+        switch(moveDirection) {
+            case UPLEFT:
+                if(cur_piece.getRow() - 2 >= 0 && cur_piece.getCol() - 2 >= 0
+                && board[cur_piece.getRow() - 2][cur_piece.getCol() - 2].getPiece() == null
+                && board[cur_piece.getRow() - 1][cur_piece.getCol() - 1].getPiece() != null
+                && board[cur_piece.getRow() - 1][cur_piece.getCol() - 1].getPiece().getSide()
+                != cur_piece.getSide())
+                    return true;
+
+            break;
+            case UPRIGHT:
+                if(cur_piece.getRow() - 2 >= 0 && cur_piece.getCol() + 2 <= 7
+                && board[cur_piece.getRow() - 2][cur_piece.getCol() + 2].getPiece() == null
+                && board[cur_piece.getRow() - 1][cur_piece.getCol() + 1].getPiece() != null
+                && board[cur_piece.getRow() - 1][cur_piece.getCol() + 1].getPiece().getSide()
+                != cur_piece.getSide())
+                    return true;
+
+            break;
+            case DOWNRIGHT:
+                if(cur_piece.getRow() + 2 <= 7 && cur_piece.getCol() + 2 <= 7
+                && board[cur_piece.getRow() + 2][cur_piece.getCol() + 2].getPiece() == null
+                && board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].getPiece() != null
+                && board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].getPiece().getSide()
+                != cur_piece.getSide())
+                    return true;
+            
+
+            break;
+            case DOWNLEFT:
+                if(cur_piece.getRow() + 2 <= 7 && cur_piece.getCol() - 2 >= 0
+                && board[cur_piece.getRow() + 2][cur_piece.getCol() - 2].getPiece() == null
+                && board[cur_piece.getRow() + 1][cur_piece.getCol() - 1].getPiece() != null
+                && board[cur_piece.getRow() + 1][cur_piece.getCol() - 1].getPiece().getSide()
+                != cur_piece.getSide())
+                    return true;
+
+            break;
+            default: return false;
+
+        }
+
+        return false;
     }
     
     /**
