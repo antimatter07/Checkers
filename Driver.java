@@ -1,7 +1,10 @@
 public class Driver {
 
     public static void main(String[] args) {
-        Board board = new Board(8);
+        Piece[] compPieces = new Piece[12];
+        Piece[] humanPieces = new Piece[12];
+
+        Board board = new Board(8, compPieces, humanPieces);
 
         board.display();
 

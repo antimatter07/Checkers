@@ -9,10 +9,12 @@ public class Board {
      * @param dim The dimension of the board, usually 8 but can be changed
      *            for testing
      */
-    public Board(int dim) {
+    public Board(int dim, Piece[] computerPieces, Piece[] humanPieces) {
         dimension = dim;
         board = new Square[dimension][dimension];
         PlayerSide cur_side = PlayerSide.COMPUTER;
+        int hum_index = 0;
+        int comp_index = 0;
 
         for(int i = 0; i < dimension; i++) {
 
@@ -22,12 +24,31 @@ public class Board {
             for(int j = 0; j < dimension; j++) {
 
                 if((i == 0 || i == 2 || i == 6) && j % 2 != 0) {
+
+                    if(cur_side == PlayerSide.COMPUTER) {
+                        computerPieces[comp_index] = new Piece(cur_side, i, j);
+                        board[i][j] = new Square(i, j, computerPieces[comp_index]);
+                        comp_index++;
+                    } else {
+                        humanPieces[hum_index] = new Piece(cur_side, i, j);
+                        board[i][j] = new Square(i, j, humanPieces[hum_index]);
+                        hum_index++;
+                    }
                     
-                    board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
+                    
+                    
                     
                 } else if ((i == 1 || i == 5 || i == 7) && j % 2 == 0) {
                 
-                    board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
+                    if(cur_side == PlayerSide.COMPUTER) {
+                        computerPieces[comp_index] = new Piece(cur_side, i, j);
+                        board[i][j] = new Square(i, j, computerPieces[comp_index]);
+                        comp_index++;
+                    } else {
+                        humanPieces[hum_index] = new Piece(cur_side, i, j);
+                        board[i][j] = new Square(i, j, humanPieces[hum_index]);
+                        hum_index++;
+                    }
                     
                 } else {
                     board[i][j] = new Square(i, j);
