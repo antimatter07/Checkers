@@ -1,3 +1,4 @@
+import java.util.*;
 public class Board {
     Square[][] board;
     private int dimension;
@@ -9,10 +10,12 @@ public class Board {
      * @param dim The dimension of the board, usually 8 but can be changed
      *            for testing
      */
-    public Board(int dim) {
+    public Board(int dim, ArrayList<Piece> computerPieces, ArrayList<Piece> humanPieces) {
         dimension = dim;
         board = new Square[dimension][dimension];
         PlayerSide cur_side = PlayerSide.COMPUTER;
+        int hum_index = 0;
+        int comp_index = 0;
 
         for(int i = 0; i < dimension; i++) {
 
@@ -22,12 +25,31 @@ public class Board {
             for(int j = 0; j < dimension; j++) {
 
                 if((i == 0 || i == 2 || i == 6) && j % 2 != 0) {
+
+                    if(cur_side == PlayerSide.COMPUTER) {
+                        computerPieces.add(new Piece(cur_side, i, j));
+                        board[i][j] = new Square(i, j, computerPieces.get(comp_index));
+                        comp_index++;
+                    } else {
+                        humanPieces.add(new Piece(cur_side, i, j));
+                        board[i][j] = new Square(i, j, humanPieces.get(hum_index));
+                        hum_index++;
+                    }
                     
-                    board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
+                    
+                    
                     
                 } else if ((i == 1 || i == 5 || i == 7) && j % 2 == 0) {
                 
-                    board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
+                    if(cur_side == PlayerSide.COMPUTER) {
+                        computerPieces.add(new Piece(cur_side, i, j)) ;
+                        board[i][j] = new Square(i, j, computerPieces.get(comp_index));
+                        comp_index++;
+                    } else {
+                        humanPieces.add(new Piece(cur_side, i, j));
+                        board[i][j] = new Square(i, j, humanPieces.get(hum_index));
+                        hum_index++;
+                    }
                     
                 } else {
                     board[i][j] = new Square(i, j);
@@ -38,12 +60,35 @@ public class Board {
         }
 
     }
+
+    public void standardMove(Piece cur_piece, Direction moveDirection) {
+
+        board[cur_piece.getRow()][cur_piece.getCol()].removePiece();
+        switch(moveDirection) {
+            case UPRIGHT:
+                cur_piece.setPos(cur_piece.getRow() - 1, cur_piece.getCol() + 1);
+                break;
+            case UPLEFT:
+                cur_piece.setPos(cur_piece.getRow() - 1, cur_piece.getCol() - 1);
+                break;
+            case DOWNLEFT:
+                cur_piece.setPos(cur_piece.getRow() + 1, cur_piece.getCol() - 1);
+                break;
+            case DOWNRIGHT:
+                cur_piece.setPos(cur_piece.getRow() + 1, cur_piece.getCol() + 1);
+                break;         
+
+        }
+
+        board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
+
+    }
     
     /**
      * This method displays the board in the console.
      */
     public void display() {
-        for(int i =0; i < dimension; i++){
+        for(int i = 0; i < dimension; i++){
            
             for(int j =0; j < dimension; j++){
                 System.out.print("----");

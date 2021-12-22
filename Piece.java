@@ -11,6 +11,7 @@ public class Piece {
         this.side = side;
         this.row = row;
         this.col = col;
+        isKing = false;
 
         /*C for computer, H for human */
 
@@ -21,6 +22,15 @@ public class Piece {
         }
     }
 
+    public void setPos(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
+    public Piece(PlayerSide side) {
+        this.side = side;
+    }
+
     public String getSymbol() {
         return this.symbol;
     }
@@ -28,6 +38,10 @@ public class Piece {
     public PlayerSide getSide() {
         return this.side;
     }
+
+    public boolean isKing() {
+        return isKing;
+    } 
     
     public int getRow() {
         return row;
@@ -42,6 +56,7 @@ public class Piece {
     private int row;
     private int col;
     private String symbol;
+    private boolean isKing;
 
     
 }
