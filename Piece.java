@@ -22,6 +22,11 @@ public class Piece {
         }
     }
 
+    public void setPos(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
     public Piece(PlayerSide side) {
         this.side = side;
     }

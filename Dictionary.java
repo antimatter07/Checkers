@@ -3,3 +3,10 @@ enum PlayerSide {
     HUMAN
 }
 
+enum Direction {
+    UPRIGHT, 
+    UPLEFT,
+    DOWNRIGHT,
+    DOWNLEFT
+}
+

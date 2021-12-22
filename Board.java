@@ -59,12 +59,35 @@ public class Board {
         }
 
     }
+
+    public void standardMove(Piece cur_piece, Direction moveDirection) {
+
+        board[cur_piece.getRow()][cur_piece.getCol()].removePiece();
+        switch(moveDirection) {
+            case UPRIGHT:
+                cur_piece.setPos(cur_piece.getRow() - 1, cur_piece.getCol() + 1);
+                break;
+            case UPLEFT:
+                cur_piece.setPos(cur_piece.getRow() - 1, cur_piece.getCol() - 1);
+                break;
+            case DOWNLEFT:
+                cur_piece.setPos(cur_piece.getRow() + 1, cur_piece.getCol() - 1);
+                break;
+            case DOWNRIGHT:
+                cur_piece.setPos(cur_piece.getRow() + 1, cur_piece.getCol() + 1);
+                break;         
+
+        }
+
+        board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
+
+    }
     
     /**
      * This method displays the board in the console.
      */
     public void display() {
-        for(int i =0; i < dimension; i++){
+        for(int i = 0; i < dimension; i++){
            
             for(int j =0; j < dimension; j++){
                 System.out.print("----");
