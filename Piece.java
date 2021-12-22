@@ -27,6 +27,10 @@ public class Piece {
         this.col = col;
     }
 
+    public void setAsKing() {
+        this.isKing = true;
+    }
+
     public Piece(PlayerSide side) {
         this.side = side;
     }

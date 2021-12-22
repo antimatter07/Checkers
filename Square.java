@@ -16,6 +16,17 @@ public class Square {
         this.col = col;
     }
 
+    public Square(Square copySquare) {
+        this.row = copySquare.getRow();
+        this.col = copySquare.getCol();
+
+        this.piece = new Piece(copySquare.getPiece().getSide(), copySquare.getRow(), copySquare.getCol());
+        if(copySquare.getPiece().isKing())
+            this.piece.setAsKing();
+
+
+    }
+
     public int getRow() {
         return this.row;
     }

@@ -10,3 +10,8 @@ enum Direction {
     DOWNLEFT
 }
 
+enum MoveType {
+    JUMP,
+    STANDARD
+}
+
