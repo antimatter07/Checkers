@@ -1,3 +1,4 @@
+import java.util.*;
 public class Board {
     Square[][] board;
     private int dimension;
@@ -9,7 +10,7 @@ public class Board {
      * @param dim The dimension of the board, usually 8 but can be changed
      *            for testing
      */
-    public Board(int dim, Piece[] computerPieces, Piece[] humanPieces) {
+    public Board(int dim, ArrayList<Piece> computerPieces, ArrayList<Piece> humanPieces) {
         dimension = dim;
         board = new Square[dimension][dimension];
         PlayerSide cur_side = PlayerSide.COMPUTER;
@@ -26,12 +27,12 @@ public class Board {
                 if((i == 0 || i == 2 || i == 6) && j % 2 != 0) {
 
                     if(cur_side == PlayerSide.COMPUTER) {
-                        computerPieces[comp_index] = new Piece(cur_side, i, j);
-                        board[i][j] = new Square(i, j, computerPieces[comp_index]);
+                        computerPieces.add(new Piece(cur_side, i, j));
+                        board[i][j] = new Square(i, j, computerPieces.get(comp_index));
                         comp_index++;
                     } else {
-                        humanPieces[hum_index] = new Piece(cur_side, i, j);
-                        board[i][j] = new Square(i, j, humanPieces[hum_index]);
+                        humanPieces.add(new Piece(cur_side, i, j));
+                        board[i][j] = new Square(i, j, humanPieces.get(hum_index));
                         hum_index++;
                     }
                     
@@ -41,12 +42,12 @@ public class Board {
                 } else if ((i == 1 || i == 5 || i == 7) && j % 2 == 0) {
                 
                     if(cur_side == PlayerSide.COMPUTER) {
-                        computerPieces[comp_index] = new Piece(cur_side, i, j);
-                        board[i][j] = new Square(i, j, computerPieces[comp_index]);
+                        computerPieces.add(new Piece(cur_side, i, j)) ;
+                        board[i][j] = new Square(i, j, computerPieces.get(comp_index));
                         comp_index++;
                     } else {
-                        humanPieces[hum_index] = new Piece(cur_side, i, j);
-                        board[i][j] = new Square(i, j, humanPieces[hum_index]);
+                        humanPieces.add(new Piece(cur_side, i, j));
+                        board[i][j] = new Square(i, j, humanPieces.get(hum_index));
                         hum_index++;
                     }
                     
