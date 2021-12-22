@@ -21,14 +21,14 @@ public class Board {
 
             for(int j = 0; j < dimension; j++) {
 
-                if(i == 0 || i == 2 || i == 6) {
-                    if(j % 2 != 0) {
-                        board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
-                    }
-                } else if (i == 1 || i == 5 || i == 7) {
-                    if(j % 2 == 0) {
-                        board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
-                    }
+                if((i == 0 || i == 2 || i == 6) && j % 2 != 0) {
+                    
+                    board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
+                    
+                } else if ((i == 1 || i == 5 || i == 7) && j % 2 == 0) {
+                
+                    board[i][j] = new Square(i, j, new Piece(cur_side, i, j));
+                    
                 } else {
                     board[i][j] = new Square(i, j);
                 }
@@ -51,6 +51,8 @@ public class Board {
             System.out.println("-");
             
             for(int j =0; j < dimension; j++){
+                
+                
                 if(board[i][j].getPiece() != null){
                   System.out.print("| " + board[i][j].getPiece().getSymbol() + " ");
                 }else{
