@@ -22,6 +22,10 @@ public class Piece {
         }
     }
 
+    public Piece() {
+        
+    }
+
     public void setPos(int row, int col) {
         this.row = row;
         this.col = col;

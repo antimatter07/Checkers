@@ -8,6 +8,7 @@ public class Driver {
     public static void main(String[] args) {
         boolean canJump = false;
         Piece jumpingPiece;
+        int choice;
         ArrayList<Piece> compPieces = new ArrayList<Piece>(12);
         ArrayList<Piece> humanPieces = new ArrayList<Piece>(12);
 
@@ -18,137 +19,161 @@ public class Driver {
         
         Board board = new Board(8, compPieces, humanPieces);
         boolean isOver = false;
-        PlayerSide turn = PlayerSide.COMPUTER;
+        PlayerSide turn = PlayerSide.HUMAN;
 
         setDirections();
+        board.setPieces(humanPieces, compPieces);
 
         //generate valid human moves in this state
-        if(turn == PlayerSide.HUMAN) {
+        while(isOver == false) {
 
             
-            for(int i = 0; i < humanPieces.size(); i++) {
 
-                if(humanPieces.get(i).isKing() == false) {
+            if(turn == PlayerSide.HUMAN) {
 
-                    for(int j = 0; j < HUMAN_DIRECTIONS.length; j++) {
-                        if(board.checkStandardMove(humanPieces.get(i), HUMAN_DIRECTIONS[j]))
-                            humanMoves.add(new Move(MoveType.STANDARD, HUMAN_DIRECTIONS[j], humanPieces.get(i)));
+                
+                for(int i = 0; i < humanPieces.size(); i++) {
 
-                        else if(board.checkJumpMove(humanPieces.get(i), HUMAN_DIRECTIONS[j])) {
-                            canJump = true;
-                            jumpDirections.add(HUMAN_DIRECTIONS[j]);
+                    if(humanPieces.get(i).isKing() == false) {
 
-                            Board boardCopy = new Board(board);
+                        for(int j = 0; j < HUMAN_DIRECTIONS.length; j++) {
+                            if(board.checkStandardMove(humanPieces.get(i), HUMAN_DIRECTIONS[j]))
+                                humanMoves.add(new Move(MoveType.STANDARD, HUMAN_DIRECTIONS[j], humanPieces.get(i)));
 
-                            //keep a reference to jumping piece in copy boared for easy access
-                            jumpingPiece = boardCopy.getBoard()[humanPieces.get(i).getRow()][humanPieces.get(i).getCol()].getPiece(); 
+                            else if(board.checkJumpMove(humanPieces.get(i), HUMAN_DIRECTIONS[j])) {
+                                canJump = true;
+                                jumpDirections.add(HUMAN_DIRECTIONS[j]);
 
-                            boardCopy.jumpMove(jumpingPiece, HUMAN_DIRECTIONS[j]);
+                                Board boardCopy = new Board(board);
 
-                            while(canJump) {
-                                int k;
+                                //keep a reference to jumping piece in copy boared for easy access
+                                jumpingPiece = boardCopy.getBoard()[humanPieces.get(i).getRow()][humanPieces.get(i).getCol()].getPiece(); 
 
-                                canJump = false;
+                                boardCopy.jumpMove(jumpingPiece, HUMAN_DIRECTIONS[j]);
 
-                                for(k = 0;k < HUMAN_DIRECTIONS.length; k++) {
-                                    //for now assume that there is only 1 path
-                                    if(boardCopy.checkJumpMove(jumpingPiece, HUMAN_DIRECTIONS[k])) {
-                                        canJump = true;
-                                        jumpDirections.add(HUMAN_DIRECTIONS[k]);
-                                        break;
+                                while(canJump) {
+                                    int k;
+
+                                    canJump = false;
+
+                                    for(k = 0;k < HUMAN_DIRECTIONS.length; k++) {
+                                        //for now assume that there is only 1 path
+                                        if(boardCopy.checkJumpMove(jumpingPiece, HUMAN_DIRECTIONS[k])) {
+                                            canJump = true;
+                                            jumpDirections.add(HUMAN_DIRECTIONS[k]);
+                                            break;
+                                        }
                                     }
+
+                                    if(canJump) {
+                                        boardCopy.jumpMove(jumpingPiece, HUMAN_DIRECTIONS[k]);
+                                    }
+
+
                                 }
 
-                                if(canJump) {
-                                    boardCopy.jumpMove(jumpingPiece, HUMAN_DIRECTIONS[k]);
-                                }
+                                humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
+
+                                jumpDirections.clear();
+
 
 
                             }
 
-                            humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
-
-                            jumpDirections.clear();
-
-
+                            
+                            
 
                         }
-
                         
-                        
-
                     }
                     
                 }
-                
-            }
-        } else {
+            } else {
+            //generate valid moves for computer    
+                for(int i = 0; i < compPieces.size(); i++) {
 
-            for(int i = 0; i < compPieces.size(); i++) {
+                    if(compPieces.get(i).isKing() == false) {
 
-                if(compPieces.get(i).isKing() == false) {
+                        for(int j = 0; j < COMP_DIRECTIONS.length; j++) {
+                            if(board.checkStandardMove(compPieces.get(i), COMP_DIRECTIONS[j]))
+                                compMoves.add(new Move(MoveType.STANDARD, COMP_DIRECTIONS[j], compPieces.get(i)));
 
-                    for(int j = 0; j < COMP_DIRECTIONS.length; j++) {
-                        if(board.checkStandardMove(compPieces.get(i), COMP_DIRECTIONS[j]))
-                            compMoves.add(new Move(MoveType.STANDARD, COMP_DIRECTIONS[j], compPieces.get(i)));
+                            else if(board.checkJumpMove(compPieces.get(i), COMP_DIRECTIONS[j])) {
+                                canJump = true;
+                                jumpDirections.add(COMP_DIRECTIONS[j]);
 
-                        else if(board.checkJumpMove(compPieces.get(i), COMP_DIRECTIONS[j])) {
-                            canJump = true;
-                            jumpDirections.add(COMP_DIRECTIONS[j]);
+                                Board boardCopy = new Board(board);
 
-                            Board boardCopy = new Board(board);
+                                //keep a reference to jumping piece in copy boared for easy access
+                                jumpingPiece = boardCopy.getBoard()[compPieces.get(i).getRow()][compPieces.get(i).getCol()].getPiece(); 
 
-                            //keep a reference to jumping piece in copy boared for easy access
-                            jumpingPiece = boardCopy.getBoard()[compPieces.get(i).getRow()][compPieces.get(i).getCol()].getPiece(); 
+                                boardCopy.jumpMove(jumpingPiece, COMP_DIRECTIONS[j]);
 
-                            boardCopy.jumpMove(jumpingPiece, COMP_DIRECTIONS[j]);
+                                while(canJump) {
+                                    int k;
 
-                            while(canJump) {
-                                int k;
+                                    canJump = false;
 
-                                canJump = false;
-
-                                for(k = 0;k < COMP_DIRECTIONS.length; k++) {
-                                    //for now assume that there is only 1 path
-                                    if(boardCopy.checkJumpMove(jumpingPiece, COMP_DIRECTIONS[k])) {
-                                        canJump = true;
-                                        jumpDirections.add(COMP_DIRECTIONS[k]);
-                                        break;
+                                    for(k = 0;k < COMP_DIRECTIONS.length; k++) {
+                                        //for now assume that there is only 1 path
+                                        if(boardCopy.checkJumpMove(jumpingPiece, COMP_DIRECTIONS[k])) {
+                                            canJump = true;
+                                            jumpDirections.add(COMP_DIRECTIONS[k]);
+                                            break;
+                                        }
                                     }
+
+                                    if(canJump) {
+                                        boardCopy.jumpMove(jumpingPiece, COMP_DIRECTIONS[k]);
+                                    }
+
+
                                 }
 
-                                if(canJump) {
-                                    boardCopy.jumpMove(jumpingPiece, COMP_DIRECTIONS[k]);
-                                }
+                                compMoves.add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
+
+                                jumpDirections.clear();
+
 
 
                             }
 
-                            compMoves.add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
-
-                            jumpDirections.clear();
-
-
+                            
+                            
 
                         }
-
                         
-                        
-
                     }
                     
                 }
-                
+
             }
-
-        }
-
-        for(int i = 0; i < compMoves.size(); i++) {
             
-            System.out.println(compMoves.get(i).toString());
-        }
+            //display and pick moves
+            board.display();
+            System.out.println();
+            choice = displayMoves(turn, humanMoves, compMoves);
+            
+            //execute move
+            if(turn == PlayerSide.COMPUTER) {
+                board.executeMove(compMoves.get(choice));
+                turn = PlayerSide.HUMAN;
+                compMoves.clear();
+            } else {
+                board.executeMove(humanMoves.get(choice));
+                turn = PlayerSide.COMPUTER;
+                humanMoves.clear();
+
+            } 
+
+            //check if game is over
+          
+
         
-        board.display();
+
+        }
+
+        
 
 
     }
@@ -166,6 +191,37 @@ public class Driver {
         KING_DIRECTIONS[3] = Direction.DOWNRIGHT;
 
 
+    }
+
+    public static int displayMoves(PlayerSide turn, ArrayList<Move> humanMoves, ArrayList<Move> compMoves) {
+        Scanner sc = new Scanner(System.in);
+        int choice;
+        if(turn == PlayerSide.HUMAN) {
+            for(int i = 0; i < humanMoves.size(); i++) {
+                System.out.println("[" + i + "]" + humanMoves.get(i).toString());
+            }
+
+            do {
+                System.out.println("> Please enter your move of choice: ");
+                choice = sc.nextInt();
+
+            } while(!(choice >= 0 && choice < humanMoves.size()));
+        } else {
+
+            for(int i = 0; i < compMoves.size(); i++) {
+                System.out.println("[" + i + "]" + compMoves.get(i).toString());
+            }
+
+            do {
+                System.out.println("> Please enter your move of choice: ");
+                choice = sc.nextInt();
+
+            } while(!(choice >= 0 && choice < compMoves.size()));
+
+        }
+
+
+        return choice;
     }
 
     
