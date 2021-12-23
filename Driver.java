@@ -30,7 +30,7 @@ public class Driver {
 
                     for(int j = 0; j < HUMAN_DIRECTIONS.length; j++) {
                         if(board.checkStandardMove(humanPieces.get(i), HUMAN_DIRECTIONS[j]))
-                            humanMoves.add(new Move(MoveType.STANDARD, HUMAN_DIRECTIONS[j]));
+                            humanMoves.add(new Move(MoveType.STANDARD, HUMAN_DIRECTIONS[j], humanPieces.get(i)));
 
                         else if(board.checkJumpMove(humanPieces.get(i), HUMAN_DIRECTIONS[j])) {
                             canJump = true;
@@ -64,7 +64,7 @@ public class Driver {
 
                             }
 
-                            humanMoves.add(new Move(MoveType.JUMP, jumpDirections));
+                            humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
 
                             jumpDirections.clear();
 
@@ -83,16 +83,12 @@ public class Driver {
         } else {
 
         }
-        board.display();
-        board.standardMove(compPieces.get(9), Direction.DOWNLEFT);
-        board.display();
 
-        /*
-        do {
-
-            board.display();
-        }while(isOver == false);
-        */
+        for(int i = 0; i < humanMoves.size(); i++) {
+            System.out.println(humanMoves.get(i).toString());
+        }
+        
+        board.display();
 
 
     }
