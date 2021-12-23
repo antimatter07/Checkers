@@ -3,6 +3,10 @@ public class Board {
     private Square[][] board;
     private int dimension;
 
+    ArrayList<Piece> compPieces;
+    ArrayList<Piece> humanPieces;
+    
+
     /**
      * This constructor isntantiates the board, which is the initial
      * set up of pieces in standard checkers on an 8 x 8 board.
@@ -61,6 +65,12 @@ public class Board {
 
     }
 
+    /**
+     * Instantiates a board given another one. Makes another copy, does not point to the same
+     * reference.
+     * 
+     * @param copyBoard the board to be duplicated when this new board is intantiated
+     */
     public Board(Board copyBoard) {
         board = new Square[8][8];
 
@@ -74,10 +84,29 @@ public class Board {
         }
     }
 
+    /**
+     * Reference to the pieces of the board. Changes done here will reflect in main reference
+     * @param humanPieces the pieces of human
+     * @param compPieces the ieces of AI
+     */
+    public void setPieces(ArrayList<Piece> humanPieces, ArrayList<Piece> compPieces) {
+        this.humanPieces = humanPieces;
+        this.compPieces = compPieces;
+    }
+
+    /**
+     * This method returns the Square[][]
+     * @return the 2D array that represents the board
+     */
     public Square[][] getBoard() {
         return this.board;
     }
 
+    /**
+     * This method executes the standard move
+     * @param cur_piece piece being moved
+     * @param moveDirection direction
+     */
     public void standardMove(Piece cur_piece, Direction moveDirection) {
 
         board[cur_piece.getRow()][cur_piece.getCol()].removePiece();
@@ -99,34 +128,61 @@ public class Board {
 
         board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
 
+        //transform to king, if valid
+        if(cur_piece.getSide() == PlayerSide.HUMAN && cur_piece.getRow() == 0) {
+            cur_piece.setAsKing();
+        } else if(cur_piece.getSide() == PlayerSide.COMPUTER && cur_piece.getRow() == 7) {
+            cur_piece.setAsKing();
+        }
+
+
     }
 
-    public void jumpMove(Piece cur_piece, Direction moveDirection) {
+    /**
+     * This method execute the jump move.
+     * 
+     * @param cur_piece jumping piece
+     * @param moveDirection direction to jump to
+     * @return jumping piece, for removing the reference in other places other than the board
+     */
+    public Piece jumpMove(Piece cur_piece, Direction moveDirection) {
+
+        Piece jumpedPiece = new Piece();
         board[cur_piece.getRow()][cur_piece.getCol()].removePiece();
 
         switch(moveDirection) {
             case UPRIGHT:
+                jumpedPiece = board[cur_piece.getRow() - 1][cur_piece.getCol() + 1].getPiece();
+                board[cur_piece.getRow() - 1][cur_piece.getCol() + 1].removePiece();
                 cur_piece.setPos(cur_piece.getRow() - 2, cur_piece.getCol() + 2);
                 break;
             case UPLEFT:
+                jumpedPiece = board[cur_piece.getRow() - 1][cur_piece.getCol() - 1].getPiece();
+                board[cur_piece.getRow() - 1][cur_piece.getCol() - 1].removePiece();
                 cur_piece.setPos(cur_piece.getRow() - 2, cur_piece.getCol() - 2);
                 break;
             case DOWNLEFT:
+                jumpedPiece = board[cur_piece.getRow() + 1][cur_piece.getCol() - 1].getPiece();
+                board[cur_piece.getRow() + 1][cur_piece.getCol() - 1].removePiece();
                 cur_piece.setPos(cur_piece.getRow() + 2, cur_piece.getCol() - 2);
                 break;
             case DOWNRIGHT:
+                jumpedPiece = board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].getPiece();
+                board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].removePiece();
                 cur_piece.setPos(cur_piece.getRow() + 2, cur_piece.getCol() + 2);
                 break;         
 
         }
 
         board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
+        return jumpedPiece;
 
     }
 
     /**
      * This method checks if the piece can do a standard move given its current position
-     * and the given direction
+     * and the given direction.
+     * 
      * @param cur_piece reference to the piece in the board
      * @param moveDirection the direction being checked
      * @return true if it can do a standard move, false otherwise
@@ -164,6 +220,13 @@ public class Board {
         return false;
     }
 
+    /**
+     * Checks if a jump move is possible given a piece and direction
+     * 
+     * @param cur_piece piece being checked
+     * @param moveDirection direction
+     * @return true if a jump move is possible, false otherwise
+     */
     public boolean checkJumpMove(Piece cur_piece, Direction moveDirection) {
 
         /*If it is not out of bonds and if there is no piece and if the piece that is jumped over
@@ -240,6 +303,32 @@ public class Board {
             System.out.print("----");
         }
         System.out.print("-");
+    }
+
+    /**
+     * Given a move, this method executes the move.
+     * @param move the move to be executed on the board.
+     */
+    public void executeMove(Move move) {
+
+        Piece jumpedPiece;
+
+        if(move.getType() == MoveType.STANDARD) {
+            standardMove(move.getPiece(), move.getDirections().get(0));
+
+        } else {
+
+            for(int i = 0; i < move.getDirections().size(); i++) {
+                jumpedPiece = jumpMove(move.getPiece(),move.getDirections().get(i));
+
+                if(jumpedPiece.getSide() == PlayerSide.HUMAN) {
+                    humanPieces.remove(jumpedPiece);
+                } else {
+                    compPieces.remove(jumpedPiece);
+                }
+            }
+
+        }
     }
 
 }
