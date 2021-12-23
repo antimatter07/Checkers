@@ -269,8 +269,9 @@ public class Driver {
             /*Remove all non jumps, because a jump MUST be made if at least one jump is possible */
             if(jumpPossible == true) {
 
-                System.out.println("*IM INSIDE JUMPOS*");
+                /*System.out.println("*IM INSIDE JUMPOS*");
                 System.out.println("SIZE OF ARRAYLISTS:" + humanMoves.size() + compMoves.size());
+                */
                 if(turn == PlayerSide.HUMAN) {
 
                     for(int h = 0; h < humanMoves.size(); h++) {
@@ -293,19 +294,41 @@ public class Driver {
 
             }
 
-            choice = displayMoves(turn, humanMoves, compMoves);
-            
-            //execute move
-            if(turn == PlayerSide.COMPUTER) {
-                board.executeMove(compMoves.get(choice));
-                turn = PlayerSide.HUMAN;
-                compMoves.clear();
-            } else {
-                board.executeMove(humanMoves.get(choice));
-                turn = PlayerSide.COMPUTER;
-                humanMoves.clear();
+            //if it is either player's turn and there are legal moves that can be made, ask for a choice
+            //otherwise, player who can't make a legal move loses and theg ame is over
+            if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0)) {
+                choice = displayMoves(turn, humanMoves, compMoves);
 
-            } 
+            
+                //execute move
+                if(turn == PlayerSide.COMPUTER) {
+                    board.executeMove(compMoves.get(choice));
+
+                    if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
+                    (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
+                        isOver = true;
+
+                    turn = PlayerSide.HUMAN;
+                    
+                } else {
+                    board.executeMove(humanMoves.get(choice));
+                    if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
+                    (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
+                        isOver = true;
+
+                    turn = PlayerSide.COMPUTER;
+                    
+
+                }
+            } else isOver = true;
+
+            
+            
+
+            humanMoves.clear();
+            compMoves.clear();
+            
+            
 
             
           
@@ -318,7 +341,9 @@ public class Driver {
 
 
     }
-
+    /**
+     * This methods sets the CONSTANT directions of each player, and the king piece.
+     */
     public static void setDirections() {
         HUMAN_DIRECTIONS[0] = Direction.UPLEFT;
         HUMAN_DIRECTIONS[1] = Direction.UPRIGHT;
@@ -333,10 +358,18 @@ public class Driver {
 
 
     }
-
+    /**
+     * This method displays the move and asks the user for their choice in terms of array indexing
+     * 
+     * @param turn current turn, HUMAN or COMPUTER
+     * @param humanMoves list of possible moves
+     * @param compMoves list of possible moves
+     * @return index of choice in list of moves
+     */
     public static int displayMoves(PlayerSide turn, ArrayList<Move> humanMoves, ArrayList<Move> compMoves) {
         Scanner sc = new Scanner(System.in);
         int choice;
+        
         if(turn == PlayerSide.HUMAN) {
             for(int i = 0; i < humanMoves.size(); i++) {
                 System.out.println("[" + i + "]" + humanMoves.get(i).toString());
@@ -360,6 +393,8 @@ public class Driver {
             } while(!(choice >= 0 && choice < compMoves.size()));
 
         }
+
+        //sc.close();
 
 
         return choice;
