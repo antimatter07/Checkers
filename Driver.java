@@ -7,6 +7,7 @@ public class Driver {
 
     public static void main(String[] args) {
         boolean canJump = false;
+        boolean jumpPossible = false;
         Piece jumpingPiece;
         int choice;
         ArrayList<Piece> compPieces = new ArrayList<Piece>(12);
@@ -26,6 +27,7 @@ public class Driver {
 
         //generate valid human moves in this state
         while(isOver == false) {
+            jumpPossible = false;
 
             
 
@@ -42,6 +44,8 @@ public class Driver {
 
                             else if(board.checkJumpMove(humanPieces.get(i), HUMAN_DIRECTIONS[j])) {
                                 canJump = true;
+                                jumpPossible = true;
+
                                 jumpDirections.add(HUMAN_DIRECTIONS[j]);
 
                                 Board boardCopy = new Board(board);
@@ -87,7 +91,58 @@ public class Driver {
                         
                     } else {
                         //for king
+                        for(int j = 0; j < KING_DIRECTIONS.length; j++) {
+                            if(board.checkStandardMove(humanPieces.get(i), KING_DIRECTIONS[j]))
+                                humanMoves.add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], humanPieces.get(i)));
+
+                            else if(board.checkJumpMove(humanPieces.get(i), KING_DIRECTIONS[j])) {
+                                canJump = true;
+                                jumpPossible = true;
+                                jumpDirections.add(KING_DIRECTIONS[j]);
+
+                                Board boardCopy = new Board(board);
+
+                                //keep a reference to jumping piece in copy boared for easy access
+                                jumpingPiece = boardCopy.getBoard()[humanPieces.get(i).getRow()][humanPieces.get(i).getCol()].getPiece(); 
+
+                                boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[j]);
+
+                                while(canJump) {
+                                    int k;
+
+                                    canJump = false;
+
+                                    for(k = 0;k < KING_DIRECTIONS.length; k++) {
+                                        //for now assume that there is only 1 path
+                                        if(boardCopy.checkJumpMove(jumpingPiece, KING_DIRECTIONS[k])) {
+                                            canJump = true;
+                                            jumpDirections.add(KING_DIRECTIONS[k]);
+                                            break;
+                                        }
+                                    }
+
+                                    if(canJump) {
+                                        boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[k]);
+                                    }
+
+
+                                }
+
+                                humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
+
+                                jumpDirections.clear();
+
+
+
+                            }
+
+                            
+                            
+
+                        }
+
                         
+
                     }
                     
                 }
@@ -103,6 +158,8 @@ public class Driver {
 
                             else if(board.checkJumpMove(compPieces.get(i), COMP_DIRECTIONS[j])) {
                                 canJump = true;
+                                jumpPossible = true;
+
                                 jumpDirections.add(COMP_DIRECTIONS[j]);
 
                                 Board boardCopy = new Board(board);
@@ -149,6 +206,56 @@ public class Driver {
                     } else {
 
                         //for king
+                        for(int j = 0; j < KING_DIRECTIONS.length; j++) {
+                            if(board.checkStandardMove(compPieces.get(i), KING_DIRECTIONS[j]))
+                                compMoves.add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], compPieces.get(i)));
+
+                            else if(board.checkJumpMove(compPieces.get(i), KING_DIRECTIONS[j])) {
+                                canJump = true;
+                                jumpPossible = true;
+                                jumpDirections.add(KING_DIRECTIONS[j]);
+
+                                Board boardCopy = new Board(board);
+
+                                //keep a reference to jumping piece in copy boared for easy access
+                                jumpingPiece = boardCopy.getBoard()[compPieces.get(i).getRow()][compPieces.get(i).getCol()].getPiece(); 
+
+                                boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[j]);
+
+                                while(canJump) {
+                                    int k;
+
+                                    canJump = false;
+
+                                    for(k = 0;k < KING_DIRECTIONS.length; k++) {
+                                        //for now assume that there is only 1 path
+                                        if(boardCopy.checkJumpMove(jumpingPiece, KING_DIRECTIONS[k])) {
+                                            canJump = true;
+                                            jumpDirections.add(KING_DIRECTIONS[k]);
+                                            break;
+                                        }
+                                    }
+
+                                    if(canJump) {
+                                        boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[k]);
+                                    }
+
+
+                                }
+
+                                compMoves.add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
+
+                                jumpDirections.clear();
+
+
+
+                            }
+
+                            
+                            
+
+                        }
+                        
                     }
                     
                 }
@@ -158,6 +265,34 @@ public class Driver {
             //display and pick moves
             board.display();
             System.out.println();
+
+            /*Remove all non jumps, because a jump MUST be made if at least one jump is possible */
+            if(jumpPossible == true) {
+
+                System.out.println("*IM INSIDE JUMPOS*");
+                System.out.println("SIZE OF ARRAYLISTS:" + humanMoves.size() + compMoves.size());
+                if(turn == PlayerSide.HUMAN) {
+
+                    for(int h = 0; h < humanMoves.size(); h++) {
+                        if(humanMoves.get(h).getType() == MoveType.STANDARD) {
+                            humanMoves.remove(h);
+                            --h;
+                        }
+                    }
+
+                } else {
+
+                    for(int h = 0; h < compMoves.size(); h++) {
+                        if(compMoves.get(h).getType() == MoveType.STANDARD) {
+                            compMoves.remove(h);
+                            --h;
+                        }
+                    }
+
+                }
+
+            }
+
             choice = displayMoves(turn, humanMoves, compMoves);
             
             //execute move
@@ -172,7 +307,7 @@ public class Driver {
 
             } 
 
-            //check if game is over
+            
           
 
         

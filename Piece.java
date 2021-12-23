@@ -33,6 +33,11 @@ public class Piece {
 
     public void setAsKing() {
         this.isKing = true;
+        if(side == PlayerSide.COMPUTER) {
+            symbol = "KC";
+        } else {
+            symbol = "KH";
+        }
     }
 
     public Piece(PlayerSide side) {

@@ -175,6 +175,12 @@ public class Board {
         }
 
         board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
+        //transform to king, if valid
+        if(cur_piece.getSide() == PlayerSide.HUMAN && cur_piece.getRow() == 0) {
+            cur_piece.setAsKing();
+        } else if(cur_piece.getSide() == PlayerSide.COMPUTER && cur_piece.getRow() == 7) {
+            cur_piece.setAsKing();
+        }
         return jumpedPiece;
 
     }
@@ -329,6 +335,13 @@ public class Board {
             }
 
         }
+    }
+
+    public boolean isGameOver() {
+        if(humanPieces.size() == 0 || compPieces.size() == 0)
+            return true;
+        else return false;
+
     }
 
 }
