@@ -87,7 +87,57 @@ public class Driver {
                         
                     } else {
                         //for king
+                        for(int j = 0; j < KING_DIRECTIONS.length; j++) {
+                            if(board.checkStandardMove(humanPieces.get(i), KING_DIRECTIONS[j]))
+                                humanMoves.add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], humanPieces.get(i)));
+
+                            else if(board.checkJumpMove(humanPieces.get(i), KING_DIRECTIONS[j])) {
+                                canJump = true;
+                                jumpDirections.add(KING_DIRECTIONS[j]);
+
+                                Board boardCopy = new Board(board);
+
+                                //keep a reference to jumping piece in copy boared for easy access
+                                jumpingPiece = boardCopy.getBoard()[humanPieces.get(i).getRow()][humanPieces.get(i).getCol()].getPiece(); 
+
+                                boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[j]);
+
+                                while(canJump) {
+                                    int k;
+
+                                    canJump = false;
+
+                                    for(k = 0;k < KING_DIRECTIONS.length; k++) {
+                                        //for now assume that there is only 1 path
+                                        if(boardCopy.checkJumpMove(jumpingPiece, KING_DIRECTIONS[k])) {
+                                            canJump = true;
+                                            jumpDirections.add(KING_DIRECTIONS[k]);
+                                            break;
+                                        }
+                                    }
+
+                                    if(canJump) {
+                                        boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[k]);
+                                    }
+
+
+                                }
+
+                                humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
+
+                                jumpDirections.clear();
+
+
+
+                            }
+
+                            
+                            
+
+                        }
+
                         
+
                     }
                     
                 }
@@ -149,6 +199,55 @@ public class Driver {
                     } else {
 
                         //for king
+                        for(int j = 0; j < KING_DIRECTIONS.length; j++) {
+                            if(board.checkStandardMove(compPieces.get(i), KING_DIRECTIONS[j]))
+                                compMoves.add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], compPieces.get(i)));
+
+                            else if(board.checkJumpMove(compPieces.get(i), KING_DIRECTIONS[j])) {
+                                canJump = true;
+                                jumpDirections.add(KING_DIRECTIONS[j]);
+
+                                Board boardCopy = new Board(board);
+
+                                //keep a reference to jumping piece in copy boared for easy access
+                                jumpingPiece = boardCopy.getBoard()[compPieces.get(i).getRow()][compPieces.get(i).getCol()].getPiece(); 
+
+                                boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[j]);
+
+                                while(canJump) {
+                                    int k;
+
+                                    canJump = false;
+
+                                    for(k = 0;k < KING_DIRECTIONS.length; k++) {
+                                        //for now assume that there is only 1 path
+                                        if(boardCopy.checkJumpMove(jumpingPiece, KING_DIRECTIONS[k])) {
+                                            canJump = true;
+                                            jumpDirections.add(KING_DIRECTIONS[k]);
+                                            break;
+                                        }
+                                    }
+
+                                    if(canJump) {
+                                        boardCopy.jumpMove(jumpingPiece, KING_DIRECTIONS[k]);
+                                    }
+
+
+                                }
+
+                                compMoves.add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
+
+                                jumpDirections.clear();
+
+
+
+                            }
+
+                            
+                            
+
+                        }
+                        
                     }
                     
                 }
