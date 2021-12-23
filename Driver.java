@@ -85,6 +85,9 @@ public class Driver {
 
                         }
                         
+                    } else {
+                        //for king
+                        
                     }
                     
                 }
@@ -143,6 +146,9 @@ public class Driver {
 
                         }
                         
+                    } else {
+
+                        //for king
                     }
                     
                 }
