@@ -337,5 +337,12 @@ public class Board {
         }
     }
 
+    public boolean isGameOver() {
+        if(humanPieces.size() == 0 || compPieces.size() == 0)
+            return true;
+        else return false;
+
+    }
+
 }
     
