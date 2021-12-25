@@ -81,8 +81,8 @@ public class Node {
         newNode.generateMoves(newNode);
         
 
-        //System.out.println("**MAX B4 TERMINAL");
-        //System.out.println("TERMINAL?" + isTerminal());
+        System.out.println("**MAX B4 TERMINAL");
+        System.out.println("TERMINAL?" + isTerminal());
         if(newNode.isTerminal())
             return newNode.utility();
 
@@ -99,7 +99,7 @@ public class Node {
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
 
             //System.out.println("**AFTER MOVE EXECUTION**");
-            //copyBoards.get(i).display();
+            copyBoards.get(i).display();
             //System.out.println(copyBoards.get(i).getHumPieces());
             //System.out.println(copyBoards.get(i).getCompPieces());
 
@@ -126,8 +126,8 @@ public class Node {
 
         newNode.generateMoves(newNode);
         
-        //System.out.println("**MIN V4 TERMINAL");
-        //System.out.println("TERMINAL?" + isTerminal());
+        System.out.println("**MIN V4 TERMINAL");
+        System.out.println("TERMINAL?" + isTerminal());
         if(newNode.isTerminal())
             return newNode.utility();
 
@@ -142,7 +142,7 @@ public class Node {
             
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
             //System.out.println("**AFTER MOVE EXECUTION**");
-            //copyBoards.get(i).display();
+            copyBoards.get(i).display();
             //System.out.println(copyBoards.get(i).getHumPieces());
             //System.out.println(copyBoards.get(i).getCompPieces());
 
