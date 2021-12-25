@@ -3,8 +3,8 @@ public class Board {
     private Square[][] board;
     private int dimension;
 
-    ArrayList<Piece> compPieces;
-    ArrayList<Piece> humanPieces;
+    private ArrayList<Piece> compPieces;
+    private ArrayList<Piece> humanPieces;
     
 
     /**
@@ -73,6 +73,10 @@ public class Board {
      */
     public Board(Board copyBoard) {
         board = new Square[8][8];
+        dimension = 8;
+
+        compPieces = new ArrayList<Piece>(copyBoard.getCompPieces());
+        humanPieces = new ArrayList<Piece>(copyBoard.getHumPieces());
 
         for(int i = 0; i < 8; i++) {
 
@@ -126,6 +130,7 @@ public class Board {
 
         }
 
+        //System.out.println("*CUR PIECE ROW COL" + cur_piece.getRow() + cur_piece.getCol());
         board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
 
         //transform to king, if valid
@@ -170,9 +175,14 @@ public class Board {
                 jumpedPiece = board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].getPiece();
                 board[cur_piece.getRow() + 1][cur_piece.getCol() + 1].removePiece();
                 cur_piece.setPos(cur_piece.getRow() + 2, cur_piece.getCol() + 2);
-                break;         
+                break;   
+                  
 
         }
+
+        //
+        //humanPieces.remove(jumpedPiece);
+        //compPieces.remove(jumpedPiece);
 
         board[cur_piece.getRow()][cur_piece.getCol()].movePieceIn(cur_piece);
         //transform to king, if valid
@@ -343,6 +353,16 @@ public class Board {
         else return false;
 
     }
+
+    public ArrayList<Piece> getCompPieces() {
+        return compPieces;
+    }
+
+    public ArrayList<Piece> getHumPieces() {
+        return humanPieces;
+    }
+
+
 
 }
     

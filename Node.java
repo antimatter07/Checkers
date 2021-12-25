@@ -1,37 +1,254 @@
 import java.util.*;
-public class Driver {
+public class Node {
+
+    //deep copy of the configuaration of the board
+    private Board board;
+
+    //possible moves player can make
+    private ArrayList<Move> moves;
+
+    //the player on this state
+    private PlayerSide player;
+
+    private boolean isComp;
+
     private static final Direction[] HUMAN_DIRECTIONS = new Direction[2];
     private static final Direction[] COMP_DIRECTIONS = new Direction[2];
     private static final Direction[] KING_DIRECTIONS = new Direction[4];
 
+    
+    /**
+     * Makes a new node given the config of the board, list of moves, and player
+     * @param board deep copy of the config of the board
+     * @param moves list of moves 
+     * @param isComp if this is true, player is the computer, flase otherwise
+     */
+    /*
+    public Node(Board board, ArrayList<Move> moves, boolean isComp) {
+        //make a deep copy
 
-    public static void main(String[] args) {
+        this.moves = new ArrayList<Move>(moves);
+        this.board = new Board(board);
+
+        this.isComp = isComp;
+        if(isComp)
+            player = PlayerSide.COMPUTER;
+        else player = PlayerSide.HUMAN;
+
+    }
+    */
+
+    public Node(Board board, boolean isComp) {
+        this.board = new Board(board);
+        this.moves = new ArrayList<Move>();
+
+        this.isComp = isComp;
+
+        if(isComp)
+            player = PlayerSide.COMPUTER;
+        else player = PlayerSide.HUMAN;
+
+    }
+
+    /**
+     * Determines if the state is a terminal state.
+     * @return true if it is a terminal node (game is over), false otherwise.
+     */
+    public boolean isTerminal() {
+        if(this.board.isGameOver() || moves.size() == 0)
+            return true;
+        return false;
+    }
+
+    public Move MinMaxSearch() {
+        Move move;
+        //System.out.println("**INSIDE MINMAX**");
+
+        move = this.max_value(this);
+
+        return move;
+
+    }
+
+    public Move max_value(Node newNode) {
+
+        ArrayList<Board> copyBoards = new ArrayList<Board>();
+        //negative infinity, lowest value imposssible 
+        Move move = new Move(-100);
+        //some arbitrary value
+        Move move2 = new Move(0);
+
+        newNode.generateMoves(newNode);
+        
+
+        //System.out.println("**MAX B4 TERMINAL");
+        //System.out.println("TERMINAL?" + isTerminal());
+        if(newNode.isTerminal())
+            return newNode.utility();
+
+        
+        //System.out.println("**MAX");
+        //System.out.println("AI MOVES");
+        //System.out.println(newNode.getMoves());
+        
+        for(int i = 0; i < newNode.getMoves().size(); i++) {
+            copyBoards.add(new Board(newNode.getBoard()));
+            
+            //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
+
+            copyBoards.get(i).executeMove(newNode.getMoves().get(i));
+
+            //System.out.println("**AFTER MOVE EXECUTION**");
+            //copyBoards.get(i).display();
+            //System.out.println(copyBoards.get(i).getHumPieces());
+            //System.out.println(copyBoards.get(i).getCompPieces());
+
+            move2 = newNode.min_value(new Node(copyBoards.get(i), !isComp));
+
+            if(move2.getValue() > move.getValue())
+                move = move2;
+
+
+        }
+
+        return move;
+
+
+    }
+
+    public Move min_value(Node newNode) {
+        
+        ArrayList<Board> copyBoards = new ArrayList<Board>();
+        //negative infinity, lowest value imposssible 
+        Move move = new Move(100);
+        //some arbitrary value
+        Move move2 = new Move(0);
+
+        newNode.generateMoves(newNode);
+        
+        //System.out.println("**MIN V4 TERMINAL");
+        //System.out.println("TERMINAL?" + isTerminal());
+        if(newNode.isTerminal())
+            return newNode.utility();
+
+        
+        //System.out.println("**MIN");
+        //System.out.println("AI MOVES");
+        //System.out.println(newNode.getMoves());
+        
+        for(int i = 0; i < newNode.getMoves().size(); i++) {
+            copyBoards.add(new Board(newNode.getBoard()));
+            //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
+            
+            copyBoards.get(i).executeMove(newNode.getMoves().get(i));
+            //System.out.println("**AFTER MOVE EXECUTION**");
+            //copyBoards.get(i).display();
+            //System.out.println(copyBoards.get(i).getHumPieces());
+            //System.out.println(copyBoards.get(i).getCompPieces());
+
+            move2 = newNode.max_value(new Node(copyBoards.get(i), !isComp));
+
+            if(move2.getValue() < move.getValue())
+                move = move2;
+
+
+        }
+
+        return move;
+
+
+    }
+
+    public Move utility() {
+        Move move = new Move(0);
+
+        if(this.board.getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && moves.size() == 0))
+            move.setValue(1);
+        else if(this.board.getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
+            move.setValue(-1);
+        return move;
+    }
+
+    public static void setDirections() {
+        HUMAN_DIRECTIONS[0] = Direction.UPLEFT;
+        HUMAN_DIRECTIONS[1] = Direction.UPRIGHT;
+
+        COMP_DIRECTIONS[0] = Direction.DOWNLEFT;
+        COMP_DIRECTIONS[1] = Direction.DOWNRIGHT;
+
+        KING_DIRECTIONS[0] = Direction.UPLEFT;
+        KING_DIRECTIONS[1] = Direction.UPRIGHT;
+        KING_DIRECTIONS[2] = Direction.DOWNLEFT;
+        KING_DIRECTIONS[3] = Direction.DOWNRIGHT;
+
+
+    }
+
+    public void generateMoves(Node newNode) {
         boolean canJump = false;
         boolean jumpPossible = false;
         Piece jumpingPiece;
-        int choice;
-        ArrayList<Piece> compPieces = new ArrayList<Piece>(12);
-        ArrayList<Piece> humanPieces = new ArrayList<Piece>(12);
-
-        ArrayList<Move> compMoves = new ArrayList<Move>();
-        ArrayList<Move> humanMoves = new ArrayList<Move>();
+        ArrayList<Piece> compPieces = new ArrayList<Piece>();
+        ArrayList<Piece> humanPieces = new ArrayList<Piece>();
+        int ind, ind2;
 
         ArrayList<Direction> jumpDirections = new ArrayList<Direction>();
-        
-        Board board = new Board(8, compPieces, humanPieces);
-        boolean isOver = false;
-        PlayerSide turn = PlayerSide.HUMAN;
+
+        //System.out.println("**BOARD IN GENERATE MOVES NODE METHOD**");
+        //newNode.getBoard().display();
+
+        //System.out.println(compPieces);
+        //System.out.println(humanPieces);
+       
+        //System.out.println(newNode.getMoves());
+    
 
         setDirections();
-        board.setPieces(humanPieces, compPieces);
 
-        //generate valid human moves in this state
-        while(isOver == false) {
-            jumpPossible = false;
+        for(int i = 0; i < 8; i++) {
+
+            for(int j = 0; j < 8; j++) {
+                if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                    
+                    if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.HUMAN)
+                        humanPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
+                    else compPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
+                }
+
+            }
+        }
+
+        newNode.getBoard().setPieces(humanPieces, compPieces);
+
+        jumpPossible = false;
+
+        //double check if list of pieces is CORRECT.
+
+        //System.out.println("**PIECES IN ACTUAL BOARD OBJECT**");
+        for(int i = 0; i < 8; i++) {
+
+            for(int j = 0; j < 8; j++) {
+                if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                    //System.out.println(newNode.getBoard().getBoard()[i][j].getPiece());
+
+                    ind = humanPieces.indexOf(newNode.getBoard().getBoard()[i][j].getPiece());
+                    ind2 = compPieces.indexOf(newNode.getBoard().getBoard()[i][j].getPiece());
+
+                    //System.out.println("VALUE OF INDICES: " + ind + ind2);
+                    if(ind == -1 && ind2 == -1) {
+                        humanPieces.remove(newNode.getBoard().getBoard()[i][j].getPiece());
+                    }
+                }
+
+            }
+        }
+
+        //System.out.println(compPieces);
+        //System.out.println(humanPieces);
 
             
 
-            if(turn == PlayerSide.HUMAN) {
+            if(player == PlayerSide.HUMAN) {
 
                 
                 for(int i = 0; i < humanPieces.size(); i++) {
@@ -40,7 +257,7 @@ public class Driver {
 
                         for(int j = 0; j < HUMAN_DIRECTIONS.length; j++) {
                             if(board.checkStandardMove(humanPieces.get(i), HUMAN_DIRECTIONS[j]))
-                                humanMoves.add(new Move(MoveType.STANDARD, HUMAN_DIRECTIONS[j], humanPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.STANDARD, HUMAN_DIRECTIONS[j], humanPieces.get(i)));
 
                             else if(board.checkJumpMove(humanPieces.get(i), HUMAN_DIRECTIONS[j])) {
                                 canJump = true;
@@ -50,9 +267,13 @@ public class Driver {
 
                                 Board boardCopy = new Board(board);
 
+
+                                //System.out.println("*BOARD IN JUMPING PIECE*");
+                               // boardCopy.display();
+
                                 //keep a reference to jumping piece in copy boared for easy access
                                 jumpingPiece = boardCopy.getBoard()[humanPieces.get(i).getRow()][humanPieces.get(i).getCol()].getPiece(); 
-
+                                //System.out.println("**JUMPING PIECE!" + humanPieces.get(i));
                                 boardCopy.jumpMove(jumpingPiece, HUMAN_DIRECTIONS[j]);
 
                                 while(canJump) {
@@ -76,7 +297,7 @@ public class Driver {
 
                                 }
 
-                                humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
 
                                 jumpDirections.clear();
 
@@ -93,7 +314,7 @@ public class Driver {
                         //for king
                         for(int j = 0; j < KING_DIRECTIONS.length; j++) {
                             if(board.checkStandardMove(humanPieces.get(i), KING_DIRECTIONS[j]))
-                                humanMoves.add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], humanPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], humanPieces.get(i)));
 
                             else if(board.checkJumpMove(humanPieces.get(i), KING_DIRECTIONS[j])) {
                                 canJump = true;
@@ -128,7 +349,7 @@ public class Driver {
 
                                 }
 
-                                humanMoves.add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.JUMP, jumpDirections, humanPieces.get(i)));
 
                                 jumpDirections.clear();
 
@@ -154,7 +375,7 @@ public class Driver {
 
                         for(int j = 0; j < COMP_DIRECTIONS.length; j++) {
                             if(board.checkStandardMove(compPieces.get(i), COMP_DIRECTIONS[j]))
-                                compMoves.add(new Move(MoveType.STANDARD, COMP_DIRECTIONS[j], compPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.STANDARD, COMP_DIRECTIONS[j], compPieces.get(i)));
 
                             else if(board.checkJumpMove(compPieces.get(i), COMP_DIRECTIONS[j])) {
                                 canJump = true;
@@ -190,7 +411,7 @@ public class Driver {
 
                                 }
 
-                                compMoves.add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
 
                                 jumpDirections.clear();
 
@@ -208,7 +429,7 @@ public class Driver {
                         //for king
                         for(int j = 0; j < KING_DIRECTIONS.length; j++) {
                             if(board.checkStandardMove(compPieces.get(i), KING_DIRECTIONS[j]))
-                                compMoves.add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], compPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.STANDARD, KING_DIRECTIONS[j], compPieces.get(i)));
 
                             else if(board.checkJumpMove(compPieces.get(i), KING_DIRECTIONS[j])) {
                                 canJump = true;
@@ -243,7 +464,7 @@ public class Driver {
 
                                 }
 
-                                compMoves.add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
+                                newNode.getMoves().add(new Move(MoveType.JUMP, jumpDirections, compPieces.get(i)));
 
                                 jumpDirections.clear();
 
@@ -261,10 +482,6 @@ public class Driver {
                 }
 
             }
-            
-            //display and pick moves
-            board.display();
-            System.out.println();
 
             /*Remove all non jumps, because a jump MUST be made if at least one jump is possible */
             if(jumpPossible == true) {
@@ -272,164 +489,41 @@ public class Driver {
                 /*System.out.println("*IM INSIDE JUMPOS*");
                 System.out.println("SIZE OF ARRAYLISTS:" + humanMoves.size() + compMoves.size());
                 */
-                if(turn == PlayerSide.HUMAN) {
+                if(player == PlayerSide.HUMAN) {
 
-                    for(int h = 0; h < humanMoves.size(); h++) {
-                        if(humanMoves.get(h).getType() == MoveType.STANDARD) {
-                            humanMoves.remove(h);
+                    for(int h = 0; h < moves.size(); h++) {
+                        if(newNode.getMoves().get(h).getType() == MoveType.STANDARD) {
+                            newNode.getMoves().remove(h);
                             --h;
                         }
                     }
-
-                    
 
                 } else {
 
-                    for(int h = 0; h < compMoves.size(); h++) {
-                        if(compMoves.get(h).getType() == MoveType.STANDARD) {
-                            compMoves.remove(h);
+                    for(int h = 0; h < moves.size(); h++) {
+                        if(newNode.getMoves().get(h).getType() == MoveType.STANDARD) {
+                            newNode.getMoves().remove(h);
                             --h;
                         }
                     }
-
 
                 }
 
             }
 
-            //if it is either player's turn and there are legal moves that can be made, ask for a choice
-            //otherwise, player who can't make a legal move loses and theg ame is over
-            if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0)) {
-                choice = displayMoves(turn, humanMoves, compMoves);
-
-                
-                //execute move
-                if(turn == PlayerSide.COMPUTER) {
-
-                    Node root = new Node(board, true);
-                    root.MinMaxSearch();
-                    //System.out.println("*AI's choice: " + root.MinMaxSearch());
-
-                    board.executeMove(compMoves.get(choice));
-
-                    if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
-                    (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
-                        isOver = true;
-
-                    turn = PlayerSide.HUMAN;
-                    
-                } else {
-
-                    board.executeMove(humanMoves.get(choice));
-                    if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
-                    (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
-                        isOver = true;
-
-                    turn = PlayerSide.COMPUTER;
-                    
-
-                }
-            } else isOver = true;
-
-            
-            
-
-            humanMoves.clear();
-            compMoves.clear();
-            
-            
-
-            
-          
-
-        
-
-        }
-
-        
-
-
+            //System.out.println("RESULTING MOVES: ");
+            //System.out.println(newNode.getMoves());
     }
-    /**
-     * This methods sets the CONSTANT directions of each player, and the king piece.
-     */
-    public static void setDirections() {
-        HUMAN_DIRECTIONS[0] = Direction.UPLEFT;
-        HUMAN_DIRECTIONS[1] = Direction.UPRIGHT;
 
-        COMP_DIRECTIONS[0] = Direction.DOWNLEFT;
-        COMP_DIRECTIONS[1] = Direction.DOWNRIGHT;
-
-        KING_DIRECTIONS[0] = Direction.UPLEFT;
-        KING_DIRECTIONS[1] = Direction.UPRIGHT;
-        KING_DIRECTIONS[2] = Direction.DOWNLEFT;
-        KING_DIRECTIONS[3] = Direction.DOWNRIGHT;
-
-
+    public Board getBoard() {
+        return this.board;
     }
-    /**
-     * This method displays the move and asks the user for their choice in terms of array indexing
-     * 
-     * @param turn current turn, HUMAN or COMPUTER
-     * @param humanMoves list of possible moves
-     * @param compMoves list of possible moves
-     * @return index of choice in list of moves
-     */
-    public static int displayMoves(PlayerSide turn, ArrayList<Move> humanMoves, ArrayList<Move> compMoves) {
-        Scanner sc = new Scanner(System.in);
-        int choice;
-        
-        if(turn == PlayerSide.HUMAN) {
-            for(int i = 0; i < humanMoves.size(); i++) {
-                System.out.println("[" + i + "]" + humanMoves.get(i).toString());
-            }
 
-            do {
-                System.out.println("> Please enter your move of choice: ");
-                choice = sc.nextInt();
-
-            } while(!(choice >= 0 && choice < humanMoves.size()));
-        } else {
-
-            for(int i = 0; i < compMoves.size(); i++) {
-                System.out.println("[" + i + "]" + compMoves.get(i).toString());
-            }
-
-            do {
-                System.out.println("> Please enter your move of choice: ");
-                choice = sc.nextInt();
-
-            } while(!(choice >= 0 && choice < compMoves.size()));
-
-        }
-
-        //sc.close();
-
-
-        return choice;
+    public ArrayList<Move> getMoves() {
+        return this.moves;
     }
 
     
-    /*
-    for each piece in the players arsenal that is still alive
-        if if it is a normal piece
-            check if it can do standard move in the 2 valid directions 
-            (THIS IS DOWN LEFT DOWN RIGHT FOR COMPUTER, UPRIGHT UPLEFT FOR HUMAN)
-                add that to array of moves
-                
-                if it can not do a standard move, check if it can do
-                a jump move(including multiple jump moves)
-                    if it can, keep checking if it can capture another with other jump moves
-                    until it can not jump anymore (ONLY IN THE 2 VALID DIRECTIONS)
-                        add this to the array of moves with the direction/s of the jump
-        else if it is a king
-            do same as above, but consider ALL 4 POSSIBLE DIRECTIONS
-    
-    
-    
-    
-    
-    
-    */
+
     
 }
