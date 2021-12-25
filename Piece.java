@@ -64,6 +64,10 @@ public class Piece {
         return col;
     }
 
+    public String toString() {
+        return this.side + "ROW: " + row + " & COL: " + col;
+    }
+
 
     private PlayerSide side;
     private int row;
