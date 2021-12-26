@@ -3,7 +3,7 @@ public class Move {
     private ArrayList<Direction> directionMoves;
     private MoveType type;
     private Piece movePiece;
-    private int value;
+    private double value;
 
     public Move(MoveType type, Direction d, Piece movePiece) {
         this.type = type;
@@ -12,6 +12,14 @@ public class Move {
         this.movePiece = movePiece;
 
 
+    }
+
+    public Move(Move dupMove) {
+        this.type = dupMove.getType();
+        this.movePiece = dupMove.getPiece();
+        if(dupMove.getDirections() != null)
+            directionMoves = new ArrayList<Direction>(dupMove.getDirections());
+        this.value = dupMove.getValue();
     }
 
     public Move(MoveType type, ArrayList<Direction> directions, Piece movePiece) {
@@ -38,11 +46,11 @@ public class Move {
         return movePiece;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public double getValue() {
         return this.value;
     }
 

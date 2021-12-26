@@ -305,10 +305,11 @@ public class Driver {
                 
                 //execute move
                 if(turn == PlayerSide.COMPUTER) {
+                    Move comp;
 
                     Node root = new Node(board, true);
-                    root.MinMaxSearch();
-                    //System.out.println("*AI's choice: " + root.MinMaxSearch());
+                    
+                    System.out.println("*AI's choice: " + root.MinMaxSearch().getValue());
 
                     board.executeMove(compMoves.get(choice));
 
