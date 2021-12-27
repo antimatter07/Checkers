@@ -10,7 +10,16 @@ public class Node {
     //the player on this state
     private PlayerSide player;
 
+    
+
     private boolean isComp;
+
+    private final int max_depth = 5;
+
+    private double utility;
+
+    //move to get to this state
+    private Move move;
 
     private static final Direction[] HUMAN_DIRECTIONS = new Direction[2];
     private static final Direction[] COMP_DIRECTIONS = new Direction[2];
@@ -38,11 +47,24 @@ public class Node {
     }
     */
 
+    public Node(Board board, boolean isComp, Move move) {
+        this.board = new Board(board);
+        this.moves = new ArrayList<Move>();
+        this.move = new Move(move);
+        this.isComp = isComp;
+
+        if(isComp)
+            player = PlayerSide.COMPUTER;
+        else player = PlayerSide.HUMAN;
+
+    }
+
     public Node(Board board, boolean isComp) {
         this.board = new Board(board);
         this.moves = new ArrayList<Move>();
-
+     
         this.isComp = isComp;
+        
 
         if(isComp)
             player = PlayerSide.COMPUTER;
@@ -54,59 +76,99 @@ public class Node {
      * Determines if the state is a terminal state.
      * @return true if it is a terminal node (game is over), false otherwise.
      */
-    public boolean isTerminal() {
-        if(this.board.isGameOver() || moves.size() == 0)
+    public boolean isCutOff(Node newNode, int depth) {
+        if(newNode.getBoard().isGameOver() || newNode.getMoves().size() == 0 || depth >= max_depth)
             return true;
+    
+
         return false;
     }
 
     public Move MinMaxSearch() {
         Move move;
+        double alpha = -100;
+        double beta = 100;
+        int depth = 0;
         //System.out.println("**INSIDE MINMAX**");
-
-        move = this.max_value(this);
+        
+        move = this.max_value(this, alpha, beta, depth);
 
         return move;
 
     }
 
-    public Move max_value(Node newNode) {
+    public Move max_value(Node newNode, double alpha, double beta, int depth) {
 
         ArrayList<Board> copyBoards = new ArrayList<Board>();
-        //negative infinity, lowest value imposssible 
+        //negative infinity, a very low value that the utility function will never generate 
         Move move = new Move(-100);
         //some arbitrary value
         Move move2 = new Move(0);
+        System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
+
+        depth++;
+
+        this.isComp = !isComp;
 
         newNode.generateMoves(newNode);
         
+        
 
         System.out.println("**MAX B4 TERMINAL");
-        System.out.println("TERMINAL?" + isTerminal());
-        if(newNode.isTerminal())
-            return newNode.utility();
+        System.out.println("TERMINAL?" + isCutOff(newNode, depth));
+        System.out.println("**CUR DEPTH" + depth);
+        //System.out.println("RESULTING MOVES: ");
+        //System.out.println(newNode.getMoves());
+        
+
+        if(newNode.isCutOff(newNode, depth)) {
+            newNode.setUtility(newNode.utility(newNode));
+            newNode.getDestMove().setValue(newNode.getUtility());
+           
+            return newNode.getDestMove();
+
+        }
 
         
         //System.out.println("**MAX");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
-        
+        System.out.println("*DEST MOVE: " + newNode.getDestMove());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
+
+            System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
+            copyBoards.get(i).display();
+
+            System.out.println("**VALID MOVES: " + newNode.getMoves());
+            System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
             
+            
+
             //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
 
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
-
-            //System.out.println("**AFTER MOVE EXECUTION**");
+            
+            System.out.println("**AFTER MOVE EXECUTION**");
             copyBoards.get(i).display();
             //System.out.println(copyBoards.get(i).getHumPieces());
             //System.out.println(copyBoards.get(i).getCompPieces());
+            System.out.println("** CUR MOV BEING PASSED TO CONST (move executed): " + newNode.getMoves().get(i));
 
-            move2 = newNode.min_value(new Node(copyBoards.get(i), !isComp));
+            if(newNode.getDestMove() != null)
+                newNode.getMoves().get(i).setParent(newNode.getDestMove());
 
-            if(move2.getValue() > move.getValue())
-                move = move2;
+            move2 = newNode.min_value(new Node(copyBoards.get(i), isComp, newNode.getMoves().get(i)), alpha, beta, depth);
+
+            if(move2.getValue() > move.getValue()) {
+                move = new Move(move2);
+
+                if(move.getValue() > alpha)
+                    alpha = move.getValue();
+            }
+
+            if(move.getValue() >= beta)
+                return move;
 
 
         }
@@ -116,40 +178,71 @@ public class Node {
 
     }
 
-    public Move min_value(Node newNode) {
+    public Move min_value(Node newNode, double alpha, double beta, int depth) {
         
         ArrayList<Board> copyBoards = new ArrayList<Board>();
-        //negative infinity, lowest value imposssible 
+        //positive infinity , a big value that will never be generated by evaluation function
         Move move = new Move(100);
         //some arbitrary value
         Move move2 = new Move(0);
+        System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
         newNode.generateMoves(newNode);
-        
+
+        depth++;
+        this.isComp = !isComp;
+
         System.out.println("**MIN V4 TERMINAL");
-        System.out.println("TERMINAL?" + isTerminal());
-        if(newNode.isTerminal())
-            return newNode.utility();
+        System.out.println("TERMINAL?" + isCutOff(newNode, depth));
+        System.out.println("**CUR DEPTH" + depth);
+        //System.out.println("RESULTING MOVES: ");
+        //System.out.println(newNode.getMoves());
+
+        if(newNode.isCutOff(newNode, depth)) {
+            newNode.setUtility(newNode.utility(newNode));
+            newNode.getDestMove().setValue(newNode.getUtility());
+          
+            return newNode.getDestMove();
+
+        }
 
         
         //System.out.println("**MIN");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
-        
+        System.out.println("*DEST MOVE: " + newNode.getDestMove());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
             //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
+            System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
+            copyBoards.get(i).display();
+            System.out.println("**VALID MOVES: " + newNode.getMoves());
+            System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
+
             
+
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
-            //System.out.println("**AFTER MOVE EXECUTION**");
+            System.out.println("**AFTER MOVE EXECUTION**");
             copyBoards.get(i).display();
             //System.out.println(copyBoards.get(i).getHumPieces());
             //System.out.println(copyBoards.get(i).getCompPieces());
+            
+            System.out.println("** CUR MOV BEING PASSED TO CONST (executed): " + newNode.getMoves().get(i));
 
-            move2 = newNode.max_value(new Node(copyBoards.get(i), !isComp));
+            if(newNode.getDestMove() != null)
+                newNode.getMoves().get(i).setParent(newNode.getDestMove());
+                
+            move2 = newNode.max_value(new Node(copyBoards.get(i), isComp, newNode.getMoves().get(i)), alpha, beta, depth);
+            //System.out.println("MOVE2: " + move2);
+            if(move2.getValue() < move.getValue()) {
+                move = new Move(move2);
 
-            if(move2.getValue() < move.getValue())
-                move = move2;
+                if(move.getValue() < beta)
+                    beta = move.getValue();
+            }
+
+            if(move.getValue() <= alpha)
+                return move;
 
 
         }
@@ -159,14 +252,40 @@ public class Node {
 
     }
 
-    public Move utility() {
-        Move move = new Move(0);
+    public double utility(Node newNode) {
+        double utility;
 
-        if(this.board.getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && moves.size() == 0))
-            move.setValue(1);
-        else if(this.board.getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
-            move.setValue(-1);
-        return move;
+        //newNode.generateMoves(newNode);
+
+        if(newNode.getBoard().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
+            utility = 90;
+        else if(newNode.getBoard().getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
+            utility = -90;
+        else {
+            int compPieceScore = 0;
+            int humanPieceScore = 0;
+
+            for(int i = 0; i < newNode.getBoard().getCompPieces().size(); i++) {
+                if(newNode.getBoard().getCompPieces().get(i).isKing())
+                    compPieceScore += 2;
+                else compPieceScore++;
+
+            }
+
+            for(int i = 0; i < newNode.getBoard().getHumPieces().size(); i++) {
+                if(newNode.getBoard().getHumPieces().get(i).isKing())
+                    humanPieceScore += 2;
+                else humanPieceScore++;
+
+            }
+
+            utility = compPieceScore - humanPieceScore;
+            System.out.println("**UTILITY: " + utility);
+
+
+
+        }
+        return utility;
     }
 
     public static void setDirections() {
@@ -184,6 +303,19 @@ public class Node {
 
     }
 
+    public void initPieces(ArrayList<Piece> humanPieces, ArrayList<Piece> compPieces,Node newNode) {
+        for(int i = 0; i < 8; i++) {
+
+            for(int j = 0; j < 8; j++) {
+              if(newNode.getBoard().getBoard()[i][j].getPiece() != null) { 
+                if(newNode.getBoard().getBoard()[i][j].getPiece().getSide()== PlayerSide.HUMAN)
+                    humanPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
+                else compPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
+              } 
+            
+            }
+        }
+    }
     public void generateMoves(Node newNode) {
         boolean canJump = false;
         boolean jumpPossible = false;
@@ -204,19 +336,10 @@ public class Node {
     
 
         setDirections();
+        //System.out.println("BOARD BEFORE GENERATING MOVES: " );
+        //newNode.getBoard().display();
 
-        for(int i = 0; i < 8; i++) {
-
-            for(int j = 0; j < 8; j++) {
-                if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
-                    
-                    if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.HUMAN)
-                        humanPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
-                    else compPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
-                }
-
-            }
-        }
+        newNode.initPieces(humanPieces, compPieces, newNode);
 
         newNode.getBoard().setPieces(humanPieces, compPieces);
 
@@ -248,7 +371,7 @@ public class Node {
 
             
 
-            if(player == PlayerSide.HUMAN) {
+            if(newNode.player == PlayerSide.HUMAN) {
 
                 
                 for(int i = 0; i < humanPieces.size(); i++) {
@@ -489,7 +612,7 @@ public class Node {
                 /*System.out.println("*IM INSIDE JUMPOS*");
                 System.out.println("SIZE OF ARRAYLISTS:" + humanMoves.size() + compMoves.size());
                 */
-                if(player == PlayerSide.HUMAN) {
+                if(newNode.player == PlayerSide.HUMAN) {
 
                     for(int h = 0; h < moves.size(); h++) {
                         if(newNode.getMoves().get(h).getType() == MoveType.STANDARD) {
@@ -511,6 +634,9 @@ public class Node {
 
             }
 
+            //System.out.println("BOARD AFTER!! GENERATING MOVES: " );
+            //newNode.getBoard().display();
+
             //System.out.println("RESULTING MOVES: ");
             //System.out.println(newNode.getMoves());
     }
@@ -521,6 +647,26 @@ public class Node {
 
     public ArrayList<Move> getMoves() {
         return this.moves;
+    }
+
+    public PlayerSide getTurn() {
+        return this.player;
+    }
+
+    public double getUtility() {
+        return this.utility;
+    }
+
+    public void setUtility(double utility) {
+        this.utility = utility;
+    }
+
+    public Move getDestMove() {
+        return move;
+    }
+
+    public void setMove(Move move) {
+        this.move = move;
     }
 
     

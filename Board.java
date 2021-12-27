@@ -328,22 +328,27 @@ public class Board {
     public void executeMove(Move move) {
 
         Piece jumpedPiece;
+        Piece movingPiece;
 
-        if(move.getType() == MoveType.STANDARD) {
-            standardMove(move.getPiece(), move.getDirections().get(0));
+        movingPiece = board[move.getPiece().getRow()][move.getPiece().getCol()].getPiece();
 
-        } else {
+        
+            if(move.getType() == MoveType.STANDARD) {
+                standardMove(movingPiece, move.getDirections().get(0));
 
-            for(int i = 0; i < move.getDirections().size(); i++) {
-                jumpedPiece = jumpMove(move.getPiece(),move.getDirections().get(i));
+            } else {
 
-                if(jumpedPiece.getSide() == PlayerSide.HUMAN) {
-                    humanPieces.remove(jumpedPiece);
-                } else {
-                    compPieces.remove(jumpedPiece);
+                for(int i = 0; i < move.getDirections().size(); i++) {
+                    jumpedPiece = jumpMove(movingPiece,move.getDirections().get(i));
+                    System.out.println(jumpedPiece);
+                    if(jumpedPiece.getSide() == PlayerSide.HUMAN) {
+                        humanPieces.remove(jumpedPiece);
+                    } else {
+                        compPieces.remove(jumpedPiece);
+                    }
                 }
-            }
 
+            
         }
     }
 
