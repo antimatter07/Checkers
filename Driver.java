@@ -302,16 +302,28 @@ public class Driver {
             if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0)) {
                 choice = displayMoves(turn, humanMoves, compMoves);
 
-                
+                //old condition: if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0))
                 //execute move
+                int times = 0;
                 if(turn == PlayerSide.COMPUTER) {
                     Move comp;
 
                     Node root = new Node(board, true);
-                    
-                    System.out.println("*AI's choice: " + root.MinMaxSearch().getValue());
+                    comp = root.MinMaxSearch();
 
-                    board.executeMove(compMoves.get(choice));
+                    while(comp.getParent() != null) {
+                        System.out.println("*CHILD: " + comp);
+                        System.out.println("VALUE! : " + comp.getValue());
+                        comp = comp.getParent();
+                        System.out.println("*PARENT: " + comp);
+                        times++;
+                    
+                    }
+                    System.out.println("times looped: "+ times);
+                    System.out.println("*AI's choice: " + comp+ "UTIL: " + comp.getValue());
+                    
+                    
+                    board.executeMove(comp);
 
                     if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
                     (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
