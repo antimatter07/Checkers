@@ -300,7 +300,10 @@ public class Driver {
             //if it is either player's turn and there are legal moves that can be made, ask for a choice
             //otherwise, player who can't make a legal move loses and theg ame is over
             if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0)) {
-                choice = displayMoves(turn, humanMoves, compMoves);
+
+                choice = 0;
+                if(turn == PlayerSide.HUMAN)
+                    choice = displayMoves(turn, humanMoves, compMoves);
 
                 //old condition: if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0))
                 //execute move
