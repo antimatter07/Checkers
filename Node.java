@@ -265,6 +265,7 @@ public class Node {
         double utility;
         double pieceDifference;
         double numCenter;
+        double numBackPieces;
 
         //newNode.generateMoves(newNode);
 
@@ -297,13 +298,16 @@ public class Node {
 
 
             numCenter = 0;
+            //check center control
+            //https://www.youtube.com/watch?v=Lfo3yfrbUs0
+            
             for(int i = 3; i <= 4; i++) {
-                for(int j = 0; j < 8; j++) {
+                for(int j = 2; j <= 5; j++) {
                     if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
                         
                         if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
-                            numCenter++;
-                        else numCenter--;
+                            numCenter += normalW / 2;
+                        
                     }
 
                     
@@ -311,18 +315,37 @@ public class Node {
                 }
             }
 
+            //check back row (deny HUMAN from kings)
+            numBackPieces = 0;
+           
+            
+            if(newNode.getBoard().getBoard()[0][1].getPiece() != null) 
+                if(newNode.getBoard().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
+                        numBackPieces += normalW - 0.2;
+            if(newNode.getBoard().getBoard()[0][5].getPiece() != null) 
+                if(newNode.getBoard().getBoard()[0][5].getPiece().getSide() == PlayerSide.COMPUTER)
+                        numBackPieces += normalW - 0.2;
+                    
+               
+
+
+          
+
+
+
             //to prevent AI putting too much weight on center control
             //total center control is worth 1 pawn, and not 4 kings
-            numCenter = numCenter / 6;
+            
 
 
-            utility = pieceDifference + numCenter;
+            utility = pieceDifference + numCenter + numBackPieces;
             System.out.println("**UTILITY: " + utility);
 
 
-
+            
         }
         return utility;
+    
     }
 
     public static void setDirections() {
