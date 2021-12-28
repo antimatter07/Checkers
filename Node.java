@@ -81,7 +81,8 @@ public class Node {
     }
 
     /**
-     * Determines if the state is a terminal state.
+     * Determines if the state is a terminal state, or search should be cut off
+     * at the max depth set.
      * @return true if it is a terminal node (game is over), false otherwise.
      */
     public boolean isCutOff(Node newNode, int depth) {
@@ -263,6 +264,7 @@ public class Node {
     public double utility(Node newNode) {
         double utility;
         double pieceDifference;
+        double numCenter;
 
         //newNode.generateMoves(newNode);
 
@@ -294,15 +296,27 @@ public class Node {
             pieceDifference = compPieceScore - humanPieceScore;
 
 
-
+            numCenter = 0;
             for(int i = 3; i <= 4; i++) {
                 for(int j = 0; j < 8; j++) {
+                    if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                        
+                        if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
+                            numCenter++;
+                        else numCenter--;
+                    }
+
+                    
                     
                 }
             }
 
+            //to prevent AI putting too much weight on center control
+            //total center control is worth 1 pawn, and not 4 kings
+            numCenter = numCenter / 6;
 
-            utility = pieceDifference;
+
+            utility = pieceDifference + numCenter;
             System.out.println("**UTILITY: " + utility);
 
 
