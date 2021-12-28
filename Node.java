@@ -10,7 +10,7 @@ public class Node {
     //the player on this state
     private PlayerSide player;
 
-    //the value of a node, higher utility favors COMPUTER
+    //the value of a cut-off node, higher utility favors COMPUTER
     private double utility;
 
     //move to get to this state
@@ -81,7 +81,8 @@ public class Node {
     }
 
     /**
-     * Determines if the state is a terminal state.
+     * Determines if the state is a terminal state, or search should be cut off
+     * at the max depth set.
      * @return true if it is a terminal node (game is over), false otherwise.
      */
     public boolean isCutOff(Node newNode, int depth) {
@@ -94,8 +95,8 @@ public class Node {
 
     public Move MinMaxSearch() {
         Move move;
-        double alpha = -100;
-        double beta = 100;
+        double alpha = -10000;
+        double beta = 10000;
         int depth = 0;
         //System.out.println("**INSIDE MINMAX**");
         
@@ -263,14 +264,19 @@ public class Node {
     public double utility(Node newNode) {
         double utility;
         double pieceDifference;
+        double numCenter;
+        double numBackPieces;
 
         //newNode.generateMoves(newNode);
 
+        /*First, check if node is a terminal state where either HUMAN or COMPUTER wins. */
         if(newNode.getBoard().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
             utility = 90;
         else if(newNode.getBoard().getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
             utility = -90;
         else {
+
+            /*Evaluate if it is not a terminal node with the heuristic */
             int compPieceScore = 0;
             int humanPieceScore = 0;
 
@@ -287,14 +293,59 @@ public class Node {
                 else humanPieceScore += normalW;
 
             }
+            //more pieces/kings puts you at an advantageous position
             pieceDifference = compPieceScore - humanPieceScore;
-            utility = pieceDifference;
+
+
+            numCenter = 0;
+            //check center control
+            //https://www.youtube.com/watch?v=Lfo3yfrbUs0
+            
+            for(int i = 3; i <= 4; i++) {
+                for(int j = 2; j <= 5; j++) {
+                    if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                        
+                        if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
+                            numCenter += normalW / 2;
+                        
+                    }
+
+                    
+                    
+                }
+            }
+
+            //check back row (deny HUMAN from kings)
+            numBackPieces = 0;
+           
+            
+            if(newNode.getBoard().getBoard()[0][1].getPiece() != null) 
+                if(newNode.getBoard().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
+                        numBackPieces += normalW - 0.2;
+            if(newNode.getBoard().getBoard()[0][5].getPiece() != null) 
+                if(newNode.getBoard().getBoard()[0][5].getPiece().getSide() == PlayerSide.COMPUTER)
+                        numBackPieces += normalW - 0.2;
+                    
+               
+
+
+          
+
+
+
+            //to prevent AI putting too much weight on center control
+            //total center control is worth 1 pawn, and not 4 kings
+            
+
+
+            utility = pieceDifference + numCenter + numBackPieces;
             System.out.println("**UTILITY: " + utility);
 
 
-
+            
         }
         return utility;
+    
     }
 
     public static void setDirections() {
