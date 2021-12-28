@@ -10,7 +10,7 @@ public class Node {
     //the player on this state
     private PlayerSide player;
 
-    //the value of a node, higher utility favors COMPUTER
+    //the value of a cut-off node, higher utility favors COMPUTER
     private double utility;
 
     //move to get to this state
@@ -94,8 +94,8 @@ public class Node {
 
     public Move MinMaxSearch() {
         Move move;
-        double alpha = -100;
-        double beta = 100;
+        double alpha = -10000;
+        double beta = 10000;
         int depth = 0;
         //System.out.println("**INSIDE MINMAX**");
         
@@ -266,11 +266,14 @@ public class Node {
 
         //newNode.generateMoves(newNode);
 
+        /*First, check if node is a terminal state where either HUMAN or COMPUTER wins. */
         if(newNode.getBoard().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
             utility = 90;
         else if(newNode.getBoard().getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
             utility = -90;
         else {
+
+            /*Evaluate if it is not a terminal node with the heuristic */
             int compPieceScore = 0;
             int humanPieceScore = 0;
 
@@ -287,7 +290,18 @@ public class Node {
                 else humanPieceScore += normalW;
 
             }
+            //more pieces/kings puts you at an advantageous position
             pieceDifference = compPieceScore - humanPieceScore;
+
+
+
+            for(int i = 3; i <= 4; i++) {
+                for(int j = 0; j < 8; j++) {
+                    
+                }
+            }
+
+
             utility = pieceDifference;
             System.out.println("**UTILITY: " + utility);
 
