@@ -21,7 +21,7 @@ public class Node {
     private boolean isComp;
 
     //cut-off search at this depth
-    private final int max_depth = 5;
+    private final int max_depth = 4;
     //normal piece weight in eval function
     private final double normalW = 1.3;
     //king weight
@@ -116,8 +116,10 @@ public class Node {
         System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
         depth++;
+        newNode.setAsComp(true);
+        System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
 
-        this.isComp = !isComp;
+        
 
         newNode.generateMoves(newNode);
         
@@ -150,7 +152,7 @@ public class Node {
             copyBoards.get(i).display();
 
             System.out.println("**VALID MOVES: " + newNode.getMoves());
-            System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
+            //System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
             
             
 
@@ -196,10 +198,12 @@ public class Node {
         Move move2 = new Move(0);
         System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
+        newNode.setAsComp(false);
         newNode.generateMoves(newNode);
 
         depth++;
-        this.isComp = !isComp;
+        
+        System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
 
         System.out.println("**MIN V4 TERMINAL");
         System.out.println("TERMINAL?" + isCutOff(newNode, depth));
@@ -226,7 +230,7 @@ public class Node {
             System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
             copyBoards.get(i).display();
             System.out.println("**VALID MOVES: " + newNode.getMoves());
-            System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
+            //System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
 
             
 
@@ -266,6 +270,7 @@ public class Node {
         double pieceDifference;
         double numCenter;
         double numBackPieces;
+        double numVulnerable;
 
         //newNode.generateMoves(newNode);
 
@@ -327,7 +332,16 @@ public class Node {
                         numBackPieces += normalW - 0.2;
                     
                
+            //count vulnerable pieces in this state
+            double j;
+            numVulnerable = 0;
+            for(int i = 0; i < newNode.getMoves().size(); i++) {
 
+                if(newNode.getMoves().get(i).getType() == MoveType.JUMP) {
+                    j = (0.60 * normalW) * newNode.getMoves().get(i).getDirections().size();
+                    numVulnerable += j;
+                }
+            }
 
           
 
@@ -338,7 +352,7 @@ public class Node {
             
 
 
-            utility = pieceDifference + numCenter + numBackPieces;
+            utility = pieceDifference + numCenter + numBackPieces - numVulnerable;
             System.out.println("**UTILITY: " + utility);
 
 
@@ -727,6 +741,20 @@ public class Node {
 
     public void setMove(Move move) {
         this.move = move;
+    }
+
+    public void setAsComp(boolean b) {
+        if(b == true) {
+            this.isComp = true;
+            this.player = PlayerSide.COMPUTER;
+        } else {
+            this.isComp = false;
+            this.player = PlayerSide.HUMAN;
+        }
+    }
+
+    public boolean isComp() {
+        return this.isComp;
     }
 
     
