@@ -1,4 +1,5 @@
 import java.util.*;
+import java.text.*;
 public class Node {
 
     //deep copy of the configuaration of the board
@@ -30,7 +31,8 @@ public class Node {
     private final double kingW = 2;
 
     
-    
+    private static long start;
+    private static long end;
 
     
 
@@ -109,14 +111,18 @@ public class Node {
         int depth = 0;
         nodesTraversed = 0;
 
-        
+        start = System.currentTimeMillis();
+
         
       
         move = this.max_value(this, alpha, beta, depth);
+        end = System.currentTimeMillis();
             
             
         System.out.println("**NODES TRAVERSED NUM: " + nodesTraversed);
-
+        NumberFormat formatter = new DecimalFormat("#0.00000");
+        System.out.println("**Execution time is " + formatter.format((end - start) / 1000d) + " seconds**");
+    
         return move;
 
     }
@@ -159,13 +165,15 @@ public class Node {
 
         }
 
-        newNode.shallowSearch(newNode);
+        //newNode.shallowSearch(newNode);
 
         
         //System.out.println("**MAX");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
         //System.out.println("*DEST MOVE: " + newNode.getDestMove());
+
+        sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
 
@@ -242,11 +250,12 @@ public class Node {
 
         }
 
-        newNode.shallowSearch(newNode);
+        //newNode.shallowSearch(newNode);
         //System.out.println("**MIN");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
         //System.out.println("*DEST MOVE: " + newNode.getDestMove());
+        sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
             //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
@@ -288,12 +297,15 @@ public class Node {
 
     }
 
+    /*
+
     public void shallowSearch(Node newNode) {
         ArrayList<Board> copyBoards = new ArrayList<Board>();
         
         Node tempNode;
 
         for(int i = 0; i < newNode.getMoves().size(); i++) {
+            nodesTraversed++;
             copyBoards.add(new Board(newNode.getBoard()));
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
 
@@ -352,7 +364,7 @@ public class Node {
         //System.out.println("**SORTED LIST**" + newNode.getMoves());
 
     }
-
+    */
     public double utility(Node newNode) {
         double utility;
         double pieceDifference;
@@ -800,6 +812,39 @@ public class Node {
 
             //System.out.println("RESULTING MOVES: ");
             //System.out.println(newNode.getMoves());
+    }
+
+    public void sortMoves(ArrayList<Move> movesToSort) {
+
+        int availIndex = 0;
+
+        if(movesToSort.get(0).getType() == MoveType.JUMP) {
+            for(int i = 1; i < movesToSort.size(); i++) {
+
+                if(movesToSort.get(i).getDirections().size() > movesToSort.get(availIndex).getDirections().size()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                } else if(movesToSort.get(i).isKingTransform()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                }
+                
+            }
+        } else {
+
+            for(int i = 1; i < movesToSort.size(); i++) {
+
+                if(movesToSort.get(i).isKingTransform()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                }
+                
+            }
+
+
+        }
+        
+
     }
 
     public Board getBoard() {
