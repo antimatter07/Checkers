@@ -172,6 +172,8 @@ public class Node {
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
         //System.out.println("*DEST MOVE: " + newNode.getDestMove());
+
+        sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
 
@@ -253,6 +255,7 @@ public class Node {
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
         //System.out.println("*DEST MOVE: " + newNode.getDestMove());
+        sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
             //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
@@ -809,6 +812,39 @@ public class Node {
 
             //System.out.println("RESULTING MOVES: ");
             //System.out.println(newNode.getMoves());
+    }
+
+    public void sortMoves(ArrayList<Move> movesToSort) {
+
+        int availIndex = 0;
+
+        if(movesToSort.get(0).getType() == MoveType.JUMP) {
+            for(int i = 1; i < movesToSort.size(); i++) {
+
+                if(movesToSort.get(i).getDirections().size() > movesToSort.get(availIndex).getDirections().size()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                } else if(movesToSort.get(i).isKingTransform()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                }
+                
+            }
+        } else {
+
+            for(int i = 1; i < movesToSort.size(); i++) {
+
+                if(movesToSort.get(i).isKingTransform()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                }
+                
+            }
+
+
+        }
+        
+
     }
 
     public Board getBoard() {

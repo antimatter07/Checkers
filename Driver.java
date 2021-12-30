@@ -302,8 +302,11 @@ public class Driver {
             if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0)) {
 
                 choice = 0;
-                if(turn == PlayerSide.HUMAN)
+                if(turn == PlayerSide.HUMAN) {
+                    sortMoves(humanMoves);
+                    
                     choice = displayMoves(turn, humanMoves, compMoves);
+                }
 
                 //old condition: if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0))
                 //execute move
@@ -423,6 +426,39 @@ public class Driver {
 
 
         return choice;
+    }
+
+    public static void sortMoves(ArrayList<Move> movesToSort) {
+
+        int availIndex = 0;
+
+        if(movesToSort.get(0).getType() == MoveType.JUMP) {
+            for(int i = 1; i < movesToSort.size(); i++) {
+
+                if(movesToSort.get(i).getDirections().size() > movesToSort.get(availIndex).getDirections().size()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                } else if(movesToSort.get(i).isKingTransform()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                }
+                
+            }
+        } else {
+
+            for(int i = 1; i < movesToSort.size(); i++) {
+
+                if(movesToSort.get(i).isKingTransform()) {
+                    Collections.swap(movesToSort, availIndex, i);
+                    availIndex++;
+                }
+                
+            }
+
+
+        }
+        
+
     }
 
     
