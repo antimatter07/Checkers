@@ -75,7 +75,37 @@ public class Move {
     @Override
     public String toString() {
         return movePiece.getSide() + " on pos " + movePiece.getRow() + 
-        " " + movePiece.getCol() + directionMoves.toString(); 
+        " " + movePiece.getCol() + directionMoves.toString() +" UTILITY: " + this.value; 
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Move move = (Move) obj;
+        boolean equal = false;
+
+        if(move.getPiece().getRow() == this.getPiece().getRow() && move.getPiece().getCol() == this.getPiece().getRow()
+        && this.type == move.getType() && this.sameDirections(move) == true)
+            equal = true;
+
+        return equal;
+    }
+
+    public boolean sameDirections(Move move) {
+        boolean sameDirections = false;
+
+        if(this.directionMoves.size() == move.getDirections().size()) {
+            sameDirections = true;
+            for(int i = 0; i < directionMoves.size(); i++) {
+
+                if(this.directionMoves.get(i) != move.getDirections().get(i)) {
+                    sameDirections = false;
+                    break;
+                }
+
+            }
+        }
+
+        return sameDirections;
     }
 
     public ArrayList<Move> getDestMoves() {

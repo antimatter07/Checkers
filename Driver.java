@@ -15,7 +15,7 @@ public class Driver {
 
         ArrayList<Move> compMoves = new ArrayList<Move>();
         ArrayList<Move> humanMoves = new ArrayList<Move>();
-
+ 
         ArrayList<Direction> jumpDirections = new ArrayList<Direction>();
         
         Board board = new Board(8, compPieces, humanPieces);
@@ -307,7 +307,7 @@ public class Driver {
 
                 //old condition: if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0))
                 //execute move
-                int times = 0;
+                //int times = 0;
                 if(turn == PlayerSide.COMPUTER) {
                     Move comp;
 
@@ -315,14 +315,14 @@ public class Driver {
                     comp = root.MinMaxSearch();
 
                     while(comp.getParent() != null) {
-                        System.out.println("*CHILD: " + comp);
-                        System.out.println("VALUE! : " + comp.getValue());
+                        //System.out.println("*CHILD: " + comp);
+                        //System.out.println("VALUE! : " + comp.getValue());
                         comp = comp.getParent();
-                        System.out.println("*PARENT: " + comp);
-                        times++;
+                        //System.out.println("*PARENT: " + comp);
+                       
                     
                     }
-                    System.out.println("times looped: "+ times);
+                    //System.out.println("times looped: "+ times);
                     System.out.println("*AI's choice: " + comp+ "UTIL: " + comp.getValue());
                     
                     

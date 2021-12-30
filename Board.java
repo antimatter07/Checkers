@@ -340,7 +340,7 @@ public class Board {
 
                 for(int i = 0; i < move.getDirections().size(); i++) {
                     jumpedPiece = jumpMove(movingPiece,move.getDirections().get(i));
-                    System.out.println(jumpedPiece);
+                    //System.out.println(jumpedPiece);
                     if(jumpedPiece.getSide() == PlayerSide.HUMAN) {
                         humanPieces.remove(jumpedPiece);
                     } else {

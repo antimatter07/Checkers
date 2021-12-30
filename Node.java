@@ -21,17 +21,24 @@ public class Node {
     private boolean isComp;
 
     //cut-off search at this depth
-    private final int max_depth = 4;
+    private final int max_depth = 8;
+
+    
     //normal piece weight in eval function
     private final double normalW = 1.3;
     //king weight
     private final double kingW = 2;
 
     
+    
+
+    
 
     private static final Direction[] HUMAN_DIRECTIONS = new Direction[2];
     private static final Direction[] COMP_DIRECTIONS = new Direction[2];
     private static final Direction[] KING_DIRECTIONS = new Direction[4];
+
+    private static int nodesTraversed;
 
     
     /**
@@ -94,13 +101,21 @@ public class Node {
     }
 
     public Move MinMaxSearch() {
-        Move move;
+        
+       
+        Move move = new Move(0);
         double alpha = -10000;
         double beta = 10000;
         int depth = 0;
-        //System.out.println("**INSIDE MINMAX**");
+        nodesTraversed = 0;
+
         
+        
+      
         move = this.max_value(this, alpha, beta, depth);
+            
+            
+        System.out.println("**NODES TRAVERSED NUM: " + nodesTraversed);
 
         return move;
 
@@ -113,11 +128,12 @@ public class Node {
         Move move = new Move(-1000000);
         //some arbitrary value
         Move move2 = new Move(0);
-        System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
+        //System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
+        nodesTraversed++;
         depth++;
         newNode.setAsComp(true);
-        System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
+        //System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
 
         
 
@@ -125,9 +141,9 @@ public class Node {
         
         
 
-        System.out.println("**MAX B4 TERMINAL");
-        System.out.println("TERMINAL?" + isCutOff(newNode, depth));
-        System.out.println("**CUR DEPTH" + depth);
+        //System.out.println("**MAX B4 TERMINAL");
+        //System.out.println("TERMINAL?" + isCutOff(newNode, depth));
+       // System.out.println("**CUR DEPTH" + depth);
         //System.out.println("RESULTING MOVES: ");
         //System.out.println(newNode.getMoves());
         
@@ -135,23 +151,28 @@ public class Node {
         if(newNode.isCutOff(newNode, depth)) {
             newNode.setUtility(newNode.utility(newNode));
             newNode.getDestMove().setValue(newNode.getUtility());
+            //add move after evaluating to arraylist
+            
+        
            
             return newNode.getDestMove();
 
         }
 
+        newNode.shallowSearch(newNode);
+
         
         //System.out.println("**MAX");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
-        System.out.println("*DEST MOVE: " + newNode.getDestMove());
+        //System.out.println("*DEST MOVE: " + newNode.getDestMove());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
 
-            System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
-            copyBoards.get(i).display();
+            //System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
+            //copyBoards.get(i).display();
 
-            System.out.println("**VALID MOVES: " + newNode.getMoves());
+            //System.out.println("**VALID MOVES: " + newNode.getMoves());
             //System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
             
             
@@ -160,11 +181,11 @@ public class Node {
 
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
             
-            System.out.println("**AFTER MOVE EXECUTION**");
-            copyBoards.get(i).display();
+            //System.out.println("**AFTER MOVE EXECUTION**");
+            //copyBoards.get(i).display();
             //System.out.println(copyBoards.get(i).getHumPieces());
             //System.out.println(copyBoards.get(i).getCompPieces());
-            System.out.println("** CUR MOV BEING PASSED TO CONST (move executed): " + newNode.getMoves().get(i));
+            //System.out.println("** CUR MOV BEING PASSED TO CONST (move executed): " + newNode.getMoves().get(i));
 
             if(newNode.getDestMove() != null)
                 newNode.getMoves().get(i).setParent(newNode.getDestMove());
@@ -196,51 +217,53 @@ public class Node {
         Move move = new Move(1000000);
         //some arbitrary value
         Move move2 = new Move(0);
-        System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
+        //System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
+        nodesTraversed++;
         newNode.setAsComp(false);
         newNode.generateMoves(newNode);
 
         depth++;
         
-        System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
+        //System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
 
-        System.out.println("**MIN V4 TERMINAL");
-        System.out.println("TERMINAL?" + isCutOff(newNode, depth));
-        System.out.println("**CUR DEPTH" + depth);
+        //System.out.println("**MIN V4 TERMINAL");
+        //System.out.println("TERMINAL?" + isCutOff(newNode, depth));
+        //System.out.println("**CUR DEPTH" + depth);
         //System.out.println("RESULTING MOVES: ");
         //System.out.println(newNode.getMoves());
 
         if(newNode.isCutOff(newNode, depth)) {
             newNode.setUtility(newNode.utility(newNode));
             newNode.getDestMove().setValue(newNode.getUtility());
+            
           
             return newNode.getDestMove();
 
         }
 
-        
+        newNode.shallowSearch(newNode);
         //System.out.println("**MIN");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
-        System.out.println("*DEST MOVE: " + newNode.getDestMove());
+        //System.out.println("*DEST MOVE: " + newNode.getDestMove());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoard()));
             //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
-            System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
-            copyBoards.get(i).display();
-            System.out.println("**VALID MOVES: " + newNode.getMoves());
+            //System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
+            //copyBoards.get(i).display();
+            //System.out.println("**VALID MOVES: " + newNode.getMoves());
             //System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
 
             
 
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
-            System.out.println("**AFTER MOVE EXECUTION**");
-            copyBoards.get(i).display();
+            //System.out.println("**AFTER MOVE EXECUTION**");
+            //copyBoards.get(i).display();
             //System.out.println(copyBoards.get(i).getHumPieces());
             //System.out.println(copyBoards.get(i).getCompPieces());
             
-            System.out.println("** CUR MOV BEING PASSED TO CONST (executed): " + newNode.getMoves().get(i));
+            //System.out.println("** CUR MOV BEING PASSED TO CONST (executed): " + newNode.getMoves().get(i));
 
             if(newNode.getDestMove() != null)
                 newNode.getMoves().get(i).setParent(newNode.getDestMove());
@@ -265,6 +288,71 @@ public class Node {
 
     }
 
+    public void shallowSearch(Node newNode) {
+        ArrayList<Board> copyBoards = new ArrayList<Board>();
+        
+        Node tempNode;
+
+        for(int i = 0; i < newNode.getMoves().size(); i++) {
+            copyBoards.add(new Board(newNode.getBoard()));
+            copyBoards.get(i).executeMove(newNode.getMoves().get(i));
+
+            tempNode = new Node(copyBoards.get(i), isComp, newNode.getMoves().get(i));
+            tempNode.generateMoves(tempNode);
+
+            newNode.getMoves().get(i).setValue(tempNode.utility(tempNode));
+
+
+            
+
+            
+
+        }
+
+        if(newNode.getMoves().size() > 0) {
+
+            if(newNode.getMoves().get(0).getPiece().getSide() == PlayerSide.COMPUTER) {
+                Collections.sort(newNode.getMoves(), new Comparator<Move>() {
+                    @Override
+                    public int compare(Move move2, Move move1)
+                    {
+                        int compareVal;
+
+                        if(move2.getValue() < move1.getValue())
+                            compareVal = 1;
+                        else if(move2.getValue() > move1.getValue())
+                            compareVal = -1;
+                        else 
+                            compareVal = 0;
+                
+                        return  compareVal;
+                    }
+                });
+            } else {
+                Collections.sort(newNode.getMoves(), new Comparator<Move>() {
+                    @Override
+                    public int compare(Move move2, Move move1)
+                    {
+                        int compareVal;
+
+                        if(move2.getValue() > move1.getValue())
+                            compareVal = 1;
+                        else if(move2.getValue() < move1.getValue())
+                            compareVal = -1;
+                        else 
+                            compareVal = 0;
+                
+                        return  compareVal;
+                    }
+                });
+
+            }
+        }
+
+        //System.out.println("**SORTED LIST**" + newNode.getMoves());
+
+    }
+
     public double utility(Node newNode) {
         double utility;
         double pieceDifference;
@@ -272,7 +360,6 @@ public class Node {
         double numBackPieces;
         double numVulnerable;
 
-        //newNode.generateMoves(newNode);
 
         /*First, check if node is a terminal state where either HUMAN or COMPUTER wins. */
         if(newNode.getBoard().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
@@ -353,7 +440,7 @@ public class Node {
 
 
             utility = pieceDifference + numCenter + numBackPieces - numVulnerable;
-            System.out.println("**UTILITY: " + utility);
+            //println("**UTILITY: " + utility);
 
 
             
