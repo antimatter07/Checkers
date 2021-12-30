@@ -5,6 +5,7 @@ public class Move {
     private Piece movePiece;
     private double value;
     private Move parent;
+    private boolean transformToKing = false;
 
     private ArrayList<Move> destMoves;
 
@@ -14,7 +15,7 @@ public class Move {
         directionMoves.add(d);
         this.movePiece = movePiece;
 
-
+        checkKingTransformation();
 
     }
 
@@ -29,6 +30,7 @@ public class Move {
             directionMoves = new ArrayList<Direction>(dupMove.getDirections());
         this.value = dupMove.getValue();
         this.setParent(dupMove.getParent());
+        this.transformToKing = dupMove.isKingTransform();
     }
 
     public Move(MoveType type, ArrayList<Direction> directions, Piece movePiece) {
@@ -37,6 +39,88 @@ public class Move {
         directionMoves = new ArrayList<Direction>(directions);
         this.movePiece = movePiece;
 
+        checkKingTransformation();
+
+    }
+
+    public boolean isKingTransform() {
+        return transformToKing;
+    }
+
+    public void checkKingTransformation() {
+        int row = movePiece.getRow();
+        
+
+
+        if(this.type == MoveType.JUMP) {
+
+            if(movePiece.getSide() == PlayerSide.COMPUTER) {
+                for(int i = 0; i < directionMoves.size(); i++) {
+                    switch(directionMoves.get(i)) {
+                        case UPRIGHT: row += 2;
+                        break;
+
+                        case UPLEFT: row += 2;
+                        break;
+
+                        case DOWNLEFT: row -= 2;
+                        break;
+
+                        case DOWNRIGHT: row -= 2;
+
+                    }
+                }
+
+                if(row == 7)
+                    this.transformToKing = true;
+
+            } else {
+
+                for(int i = 0; i < directionMoves.size(); i++) {
+                    switch(directionMoves.get(i)) {
+                        case UPRIGHT: row -= 2;
+                        break;
+
+                        case UPLEFT: row -= 2;
+                        break;
+
+                        case DOWNLEFT: row += 2;
+                        break;
+
+                        case DOWNRIGHT: row += 2;
+
+                    }
+                }
+
+                if(row == 0)
+                    this.transformToKing = true;
+
+            }
+
+
+        } else {
+
+            switch(directionMoves.get(0)) {
+                case UPRIGHT: row -= 1;
+                break;
+
+                case UPLEFT: row -= 1;
+                break;
+
+                case DOWNLEFT: row += 1;
+                break;
+
+                case DOWNRIGHT: row += 1;
+
+            }
+
+            if(this.movePiece.getSide() == PlayerSide.COMPUTER && row == 7)
+                this.transformToKing = true;
+            else if(this.movePiece.getSide() == PlayerSide.HUMAN && row == 0)
+                this.transformToKing = true;
+
+
+        }
     }
 
     public Move(int value) {
