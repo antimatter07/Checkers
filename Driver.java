@@ -15,7 +15,7 @@ public class Driver {
 
         ArrayList<Move> compMoves = new ArrayList<Move>();
         ArrayList<Move> humanMoves = new ArrayList<Move>();
-
+ 
         ArrayList<Direction> jumpDirections = new ArrayList<Direction>();
         
         Board board = new Board(8, compPieces, humanPieces);

@@ -22,16 +22,23 @@ public class Node {
 
     //cut-off search at this depth
     private final int max_depth = 4;
+
+    
     //normal piece weight in eval function
     private final double normalW = 1.3;
     //king weight
     private final double kingW = 2;
+
+    private static ArrayList<Move> movesToSort;
+    
 
     
 
     private static final Direction[] HUMAN_DIRECTIONS = new Direction[2];
     private static final Direction[] COMP_DIRECTIONS = new Direction[2];
     private static final Direction[] KING_DIRECTIONS = new Direction[4];
+
+    private static int nodesTraversed;
 
     
     /**
@@ -94,13 +101,21 @@ public class Node {
     }
 
     public Move MinMaxSearch() {
-        Move move;
+        movesToSort = new ArrayList<Move>();
+       
+        Move move = new Move(0);
         double alpha = -10000;
         double beta = 10000;
         int depth = 0;
-        //System.out.println("**INSIDE MINMAX**");
+        nodesTraversed = 0;
+
         
+        
+      
         move = this.max_value(this, alpha, beta, depth);
+            
+            
+        System.out.println("**NODES TRAVERSED NUM: " + nodesTraversed);
 
         return move;
 
@@ -113,8 +128,9 @@ public class Node {
         Move move = new Move(-1000000);
         //some arbitrary value
         Move move2 = new Move(0);
-        System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
+        System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
+        nodesTraversed++;
         depth++;
         newNode.setAsComp(true);
         System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
@@ -135,10 +151,15 @@ public class Node {
         if(newNode.isCutOff(newNode, depth)) {
             newNode.setUtility(newNode.utility(newNode));
             newNode.getDestMove().setValue(newNode.getUtility());
+            //add move after evaluating to arraylist
+            
+        
            
             return newNode.getDestMove();
 
         }
+
+        newNode.shallowSearch(newNode);
 
         
         //System.out.println("**MAX");
@@ -198,6 +219,7 @@ public class Node {
         Move move2 = new Move(0);
         System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
 
+        nodesTraversed++;
         newNode.setAsComp(false);
         newNode.generateMoves(newNode);
 
@@ -214,12 +236,13 @@ public class Node {
         if(newNode.isCutOff(newNode, depth)) {
             newNode.setUtility(newNode.utility(newNode));
             newNode.getDestMove().setValue(newNode.getUtility());
+            
           
             return newNode.getDestMove();
 
         }
 
-        
+        newNode.shallowSearch(newNode);
         //System.out.println("**MIN");
         //System.out.println("AI MOVES");
         //System.out.println(newNode.getMoves());
@@ -265,6 +288,71 @@ public class Node {
 
     }
 
+    public void shallowSearch(Node newNode) {
+        ArrayList<Board> copyBoards = new ArrayList<Board>();
+        
+        Node tempNode;
+
+        for(int i = 0; i < newNode.getMoves().size(); i++) {
+            copyBoards.add(new Board(newNode.getBoard()));
+            copyBoards.get(i).executeMove(newNode.getMoves().get(i));
+
+            tempNode = new Node(copyBoards.get(i), isComp, newNode.getMoves().get(i));
+            tempNode.generateMoves(tempNode);
+
+            newNode.getMoves().get(i).setValue(tempNode.utility(tempNode));
+
+
+            
+
+            
+
+        }
+
+        if(newNode.getMoves().size() > 0) {
+
+            if(newNode.getMoves().get(0).getPiece().getSide() == PlayerSide.COMPUTER) {
+                Collections.sort(newNode.getMoves(), new Comparator<Move>() {
+                    @Override
+                    public int compare(Move move2, Move move1)
+                    {
+                        int compareVal;
+
+                        if(move2.getValue() < move1.getValue())
+                            compareVal = 1;
+                        else if(move2.getValue() > move1.getValue())
+                            compareVal = -1;
+                        else 
+                            compareVal = 0;
+                
+                        return  compareVal;
+                    }
+                });
+            } else {
+                Collections.sort(newNode.getMoves(), new Comparator<Move>() {
+                    @Override
+                    public int compare(Move move2, Move move1)
+                    {
+                        int compareVal;
+
+                        if(move2.getValue() > move1.getValue())
+                            compareVal = 1;
+                        else if(move2.getValue() < move1.getValue())
+                            compareVal = -1;
+                        else 
+                            compareVal = 0;
+                
+                        return  compareVal;
+                    }
+                });
+
+            }
+        }
+
+        System.out.println("**SORTED LIST**" + newNode.getMoves());
+
+    }
+
     public double utility(Node newNode) {
         double utility;
         double pieceDifference;
@@ -272,7 +360,6 @@ public class Node {
         double numBackPieces;
         double numVulnerable;
 
-        //newNode.generateMoves(newNode);
 
         /*First, check if node is a terminal state where either HUMAN or COMPUTER wins. */
         if(newNode.getBoard().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
