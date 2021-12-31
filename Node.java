@@ -1,5 +1,11 @@
 import java.util.*;
 import java.text.*;
+/**
+ * This class represents a state in the game, which includes the board configuration, possible moves, the
+ * player to make a move on this state, and the utility. 
+ * 
+ * @author Matthew James D. Villarica
+ */
 public class Node {
 
     //deep copy of the configuaration of the board

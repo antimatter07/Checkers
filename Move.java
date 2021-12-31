@@ -1,4 +1,8 @@
 import java.util.*;
+/**
+ * This class represents a move that can be done on the board that will change the state.
+ * @author Matthew James D. Villarica
+ */
 public class Move {
 
     //directions this move contains, can contain UPRIGHT, UPLEFT, DOWNLEFT, DOWNRIGHT
