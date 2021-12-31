@@ -303,19 +303,24 @@ public class Driver {
 
                 choice = 0;
                 if(turn == PlayerSide.HUMAN) {
+                    /*  HUMAN VS AI*/
                     sortMoves(humanMoves);
                     
                     choice = displayMoves(turn, humanMoves, compMoves);
+                    
+
+                    /*AI VS AI */
+                    
+
+
                 }
 
-                //old condition: if((turn == PlayerSide.COMPUTER && compMoves.size() > 0) || (turn == PlayerSide.HUMAN && humanMoves.size() > 0))
-                //execute move
-                //int times = 0;
+                
                 if(turn == PlayerSide.COMPUTER) {
                     Move comp;
 
                     Node root = new Node(board, true);
-                    comp = root.MinMaxSearch();
+                    comp = root.MinMaxSearchMAX();
 
                     while(comp.getParent() != null) {
                         //System.out.println("*CHILD: " + comp);
@@ -338,8 +343,30 @@ public class Driver {
                     turn = PlayerSide.HUMAN;
                     
                 } else {
+                    /*
+                    Move hum;
+
+                    Node root = new Node(board, false);
+
+                    hum = root.MinMaxSearchMIN();
+
+                    while(hum.getParent() != null) {
+                        //System.out.println("*CHILD: " + comp);
+                        //System.out.println("VALUE! : " + comp.getValue());
+                        hum = hum.getParent();
+                        //System.out.println("*PARENT: " + comp);
+                       
+                    
+                    }
+                    //System.out.println("times looped: "+ times);
+                    System.out.println("*#2 AI's choice: " + hum + "UTIL: " + hum.getValue());
+                    
+                    
+                    board.executeMove(hum);
+                    */
 
                     board.executeMove(humanMoves.get(choice));
+                    
                     if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
                     (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
                         isOver = true;

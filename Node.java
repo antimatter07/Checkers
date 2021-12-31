@@ -22,7 +22,7 @@ public class Node {
     private boolean isComp;
 
     //cut-off search at this depth
-    private final int max_depth = 8;
+    private final int max_depth = 7;
 
     
     //normal piece weight in eval function
@@ -102,13 +102,13 @@ public class Node {
         return false;
     }
 
-    public Move MinMaxSearch() {
+    public Move MinMaxSearchMAX() {
         
        
         Move move = new Move(0);
         double alpha = -10000;
         double beta = 10000;
-        int depth = 0;
+        int depth = -1;
         nodesTraversed = 0;
 
         start = System.currentTimeMillis();
@@ -116,6 +116,31 @@ public class Node {
         
       
         move = this.max_value(this, alpha, beta, depth);
+        end = System.currentTimeMillis();
+            
+            
+        System.out.println("**NODES TRAVERSED NUM: " + nodesTraversed);
+        NumberFormat formatter = new DecimalFormat("#0.00000");
+        System.out.println("**Execution time is " + formatter.format((end - start) / 1000d) + " seconds**");
+    
+        return move;
+
+    }
+
+    public Move MinMaxSearchMIN() {
+        
+       
+        Move move = new Move(0);
+        double alpha = -10000;
+        double beta = 10000;
+        int depth = -1;
+        nodesTraversed = 0;
+
+        start = System.currentTimeMillis();
+
+        
+      
+        move = this.min_value(this, alpha, beta, depth);
         end = System.currentTimeMillis();
             
             
@@ -404,31 +429,60 @@ public class Node {
             numCenter = 0;
             //check center control
             //https://www.youtube.com/watch?v=Lfo3yfrbUs0
+            //check key positions in back row (deny oponent from kings)
+            numBackPieces = 0;
             
-            for(int i = 3; i <= 4; i++) {
-                for(int j = 2; j <= 5; j++) {
-                    if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+            if(newNode.getDestMove().getPiece().getSide() == PlayerSide.COMPUTER) {
+
+                for(int i = 3; i <= 4; i++) {
+                    for(int j = 2; j <= 5; j++) {
+                        if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                            
+                            if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
+                                numCenter += normalW / 2;
+                            
+                        }
+
                         
-                        if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
-                            numCenter += normalW / 2;
                         
                     }
-
-                    
-                    
                 }
-            }
 
-            //check back row (deny HUMAN from kings)
-            numBackPieces = 0;
-           
-            
-            if(newNode.getBoard().getBoard()[0][1].getPiece() != null) 
-                if(newNode.getBoard().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
+                if(newNode.getBoard().getBoard()[0][1].getPiece() != null) 
+                    if(newNode.getBoard().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
                         numBackPieces += normalW - 0.2;
-            if(newNode.getBoard().getBoard()[0][5].getPiece() != null) 
-                if(newNode.getBoard().getBoard()[0][5].getPiece().getSide() == PlayerSide.COMPUTER)
+                if(newNode.getBoard().getBoard()[0][5].getPiece() != null) 
+                    if(newNode.getBoard().getBoard()[0][5].getPiece().getSide() == PlayerSide.COMPUTER)
                         numBackPieces += normalW - 0.2;
+
+            } else {
+
+                for(int i = 3; i <= 4; i++) {
+                    for(int j = 2; j <= 5; j++) {
+                        if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                            
+                            if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.HUMAN)
+                                numCenter += normalW / 2;
+                            
+                        }
+
+                        
+                        
+                    }
+                }
+
+                //since HUMAN is minimizer, negative
+                numCenter *= -1;
+
+                if(newNode.getBoard().getBoard()[7][2].getPiece() != null) 
+                    if(newNode.getBoard().getBoard()[7][2].getPiece().getSide() == PlayerSide.HUMAN)
+                        numBackPieces += normalW - 0.2;
+                if(newNode.getBoard().getBoard()[7][6].getPiece() != null) 
+                    if(newNode.getBoard().getBoard()[7][6].getPiece().getSide() == PlayerSide.HUMAN)
+                        numBackPieces += normalW - 0.2;
+
+                numBackPieces *= -1;
+            }
                     
                
             //count vulnerable pieces in this state
@@ -438,9 +492,13 @@ public class Node {
 
                 if(newNode.getMoves().get(i).getType() == MoveType.JUMP) {
                     j = (0.60 * normalW) * newNode.getMoves().get(i).getDirections().size();
-                    numVulnerable += j;
+                    numVulnerable -= j;
                 }
             }
+
+            //since HUMAN is MINIMIZER, invert sign
+            if(newNode.getDestMove().getPiece().getSide() == PlayerSide.HUMAN)
+                numVulnerable *= -1;
 
           
 
@@ -451,7 +509,7 @@ public class Node {
             
 
 
-            utility = pieceDifference + numCenter + numBackPieces - numVulnerable;
+            utility = pieceDifference + numCenter + numBackPieces + numVulnerable;
             //println("**UTILITY: " + utility);
 
 
