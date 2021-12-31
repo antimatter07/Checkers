@@ -303,11 +303,11 @@ public class Driver {
 
                 choice = 0;
                 if(turn == PlayerSide.HUMAN) {
-                    /*  HUMAN VS AI
+                    /*  HUMAN VS AI*/
                     sortMoves(humanMoves);
                     
                     choice = displayMoves(turn, humanMoves, compMoves);
-                    */
+                    
 
                     /*AI VS AI */
                     
@@ -343,6 +343,7 @@ public class Driver {
                     turn = PlayerSide.HUMAN;
                     
                 } else {
+                    /*
                     Move hum;
 
                     Node root = new Node(board, false);
@@ -362,8 +363,9 @@ public class Driver {
                     
                     
                     board.executeMove(hum);
+                    */
 
-                    //board.executeMove(humanMoves.get(choice));
+                    board.executeMove(humanMoves.get(choice));
                     
                     if(board.isGameOver() || (turn == PlayerSide.COMPUTER && compMoves.size() == 0) ||
                     (turn == PlayerSide.HUMAN && humanMoves.size() == 0))
