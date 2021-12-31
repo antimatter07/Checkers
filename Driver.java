@@ -323,14 +323,11 @@ public class Driver {
                     comp = root.MinMaxSearchMAX();
 
                     while(comp.getParent() != null) {
-                        //System.out.println("*CHILD: " + comp);
-                        //System.out.println("VALUE! : " + comp.getValue());
+                        
                         comp = comp.getParent();
-                        //System.out.println("*PARENT: " + comp);
-                       
-                    
+                        
                     }
-                    //System.out.println("times looped: "+ times);
+                    
                     System.out.println("*AI's choice: " + comp+ "UTIL: " + comp.getValue());
                     
                     
