@@ -95,7 +95,7 @@ public class Node {
      * @return true if it is a terminal node (game is over), false otherwise.
      */
     public boolean isCutOff(Node newNode, int depth) {
-        if(newNode.getBoard().isGameOver() || newNode.getMoves().size() == 0 || depth >= max_depth)
+        if(newNode.getBoardConfig().isGameOver() || newNode.getMoves().size() == 0 || depth >= max_depth)
             return true;
     
 
@@ -200,7 +200,7 @@ public class Node {
 
         sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
-            copyBoards.add(new Board(newNode.getBoard()));
+            copyBoards.add(new Board(newNode.getBoardConfig()));
 
             //System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
             //copyBoards.get(i).display();
@@ -282,7 +282,7 @@ public class Node {
         //System.out.println("*DEST MOVE: " + newNode.getDestMove());
         sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
-            copyBoards.add(new Board(newNode.getBoard()));
+            copyBoards.add(new Board(newNode.getBoardConfig()));
             //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
             //System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
             //copyBoards.get(i).display();
@@ -399,9 +399,9 @@ public class Node {
 
 
         /*First, check if node is a terminal state where either HUMAN or COMPUTER wins. */
-        if(newNode.getBoard().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
+        if(newNode.getBoardConfig().getHumPieces().size() == 0 || (player == PlayerSide.HUMAN && newNode.getMoves().size() == 0))
             utility = 90;
-        else if(newNode.getBoard().getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
+        else if(newNode.getBoardConfig().getCompPieces().size() == 0 || (player == PlayerSide.COMPUTER && moves.size() == 0))
             utility = -90;
         else {
 
@@ -409,15 +409,15 @@ public class Node {
             int compPieceScore = 0;
             int humanPieceScore = 0;
 
-            for(int i = 0; i < newNode.getBoard().getCompPieces().size(); i++) {
-                if(newNode.getBoard().getCompPieces().get(i).isKing())
+            for(int i = 0; i < newNode.getBoardConfig().getCompPieces().size(); i++) {
+                if(newNode.getBoardConfig().getCompPieces().get(i).isKing())
                     compPieceScore += kingW;
                 else compPieceScore += normalW;
 
             }
 
-            for(int i = 0; i < newNode.getBoard().getHumPieces().size(); i++) {
-                if(newNode.getBoard().getHumPieces().get(i).isKing())
+            for(int i = 0; i < newNode.getBoardConfig().getHumPieces().size(); i++) {
+                if(newNode.getBoardConfig().getHumPieces().get(i).isKing())
                     humanPieceScore += kingW;
                 else humanPieceScore += normalW;
 
@@ -436,9 +436,9 @@ public class Node {
 
                 for(int i = 3; i <= 4; i++) {
                     for(int j = 2; j <= 5; j++) {
-                        if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                        if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) {
                             
-                            if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
+                            if(newNode.getBoardConfig().getBoard()[i][j].getPiece().getSide() == PlayerSide.COMPUTER)
                                 numCenter += normalW / 2;
                             
                         }
@@ -448,20 +448,20 @@ public class Node {
                     }
                 }
 
-                if(newNode.getBoard().getBoard()[0][1].getPiece() != null) 
-                    if(newNode.getBoard().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
+                if(newNode.getBoardConfig().getBoard()[0][1].getPiece() != null) 
+                    if(newNode.getBoardConfig().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
                         numBackPieces += normalW - 0.2;
-                if(newNode.getBoard().getBoard()[0][5].getPiece() != null) 
-                    if(newNode.getBoard().getBoard()[0][5].getPiece().getSide() == PlayerSide.COMPUTER)
+                if(newNode.getBoardConfig().getBoard()[0][5].getPiece() != null) 
+                    if(newNode.getBoardConfig().getBoard()[0][5].getPiece().getSide() == PlayerSide.COMPUTER)
                         numBackPieces += normalW - 0.2;
 
             } else {
 
                 for(int i = 3; i <= 4; i++) {
                     for(int j = 2; j <= 5; j++) {
-                        if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                        if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) {
                             
-                            if(newNode.getBoard().getBoard()[i][j].getPiece().getSide() == PlayerSide.HUMAN)
+                            if(newNode.getBoardConfig().getBoard()[i][j].getPiece().getSide() == PlayerSide.HUMAN)
                                 numCenter += normalW / 2;
                             
                         }
@@ -474,11 +474,11 @@ public class Node {
                 //since HUMAN is minimizer, negative
                 numCenter *= -1;
 
-                if(newNode.getBoard().getBoard()[7][2].getPiece() != null) 
-                    if(newNode.getBoard().getBoard()[7][2].getPiece().getSide() == PlayerSide.HUMAN)
+                if(newNode.getBoardConfig().getBoard()[7][2].getPiece() != null) 
+                    if(newNode.getBoardConfig().getBoard()[7][2].getPiece().getSide() == PlayerSide.HUMAN)
                         numBackPieces += normalW - 0.2;
-                if(newNode.getBoard().getBoard()[7][6].getPiece() != null) 
-                    if(newNode.getBoard().getBoard()[7][6].getPiece().getSide() == PlayerSide.HUMAN)
+                if(newNode.getBoardConfig().getBoard()[7][6].getPiece() != null) 
+                    if(newNode.getBoardConfig().getBoard()[7][6].getPiece().getSide() == PlayerSide.HUMAN)
                         numBackPieces += normalW - 0.2;
 
                 numBackPieces *= -1;
@@ -538,10 +538,10 @@ public class Node {
         for(int i = 0; i < 8; i++) {
 
             for(int j = 0; j < 8; j++) {
-              if(newNode.getBoard().getBoard()[i][j].getPiece() != null) { 
-                if(newNode.getBoard().getBoard()[i][j].getPiece().getSide()== PlayerSide.HUMAN)
-                    humanPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
-                else compPieces.add(newNode.getBoard().getBoard()[i][j].getPiece());
+              if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) { 
+                if(newNode.getBoardConfig().getBoard()[i][j].getPiece().getSide()== PlayerSide.HUMAN)
+                    humanPieces.add(newNode.getBoardConfig().getBoard()[i][j].getPiece());
+                else compPieces.add(newNode.getBoardConfig().getBoard()[i][j].getPiece());
               } 
             
             }
@@ -572,7 +572,7 @@ public class Node {
 
         newNode.initPieces(humanPieces, compPieces, newNode);
 
-        newNode.getBoard().setPieces(humanPieces, compPieces);
+        newNode.getBoardConfig().setPieces(humanPieces, compPieces);
 
         jumpPossible = false;
 
@@ -582,15 +582,15 @@ public class Node {
         for(int i = 0; i < 8; i++) {
 
             for(int j = 0; j < 8; j++) {
-                if(newNode.getBoard().getBoard()[i][j].getPiece() != null) {
+                if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) {
                     //System.out.println(newNode.getBoard().getBoard()[i][j].getPiece());
 
-                    ind = humanPieces.indexOf(newNode.getBoard().getBoard()[i][j].getPiece());
-                    ind2 = compPieces.indexOf(newNode.getBoard().getBoard()[i][j].getPiece());
+                    ind = humanPieces.indexOf(newNode.getBoardConfig().getBoard()[i][j].getPiece());
+                    ind2 = compPieces.indexOf(newNode.getBoardConfig().getBoard()[i][j].getPiece());
 
                     //System.out.println("VALUE OF INDICES: " + ind + ind2);
                     if(ind == -1 && ind2 == -1) {
-                        humanPieces.remove(newNode.getBoard().getBoard()[i][j].getPiece());
+                        humanPieces.remove(newNode.getBoardConfig().getBoard()[i][j].getPiece());
                     }
                 }
 
@@ -905,7 +905,7 @@ public class Node {
 
     }
 
-    public Board getBoard() {
+    public Board getBoardConfig() {
         return this.board;
     }
 
