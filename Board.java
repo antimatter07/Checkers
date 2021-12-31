@@ -1,9 +1,11 @@
 import java.util.*;
 public class Board {
+    //8 x8 board for gameplay
     private Square[][] board;
-    private int dimension;
 
+    //list of pieces for the maximizer, COMPUTER
     private ArrayList<Piece> compPieces;
+    //list of pieces for the minimizer, HUMAN
     private ArrayList<Piece> humanPieces;
     
 
@@ -366,6 +368,8 @@ public class Board {
     public ArrayList<Piece> getHumPieces() {
         return humanPieces;
     }
+
+    private int dimension;
 
 
 

@@ -8,7 +8,7 @@ public class Node {
     //possible moves player can make
     private ArrayList<Move> moves;
 
-    //the player on this state
+    //the player on this state, represented as an enum that can either be COMPUTER or HUMAN
     private PlayerSide player;
 
     //the value of a cut-off node, higher utility favors COMPUTER
@@ -160,65 +160,31 @@ public class Node {
         //some arbitrary value
         Move move2 = new Move(0);
 
-        //System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
+
         nodesTraversed++;
         depth++;
         newNode.setAsComp(true);
-        //System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
-
-        
 
         newNode.generateMoves(newNode);
-        
-        
-
-        //System.out.println("**MAX B4 TERMINAL");
-        //System.out.println("TERMINAL?" + isCutOff(newNode, depth));
-       // System.out.println("**CUR DEPTH" + depth);
-        //System.out.println("RESULTING MOVES: ");
-        //System.out.println(newNode.getMoves());
         
 
         if(newNode.isCutOff(newNode, depth)) {
             newNode.setUtility(newNode.utility(newNode));
             newNode.getDestMove().setValue(newNode.getUtility());
-            //add move after evaluating to arraylist
+
             
-        
-           
+
             return newNode.getDestMove();
 
         }
-
-        //newNode.shallowSearch(newNode);
-
-        
-        //System.out.println("**MAX");
-        //System.out.println("AI MOVES");
-        //System.out.println(newNode.getMoves());
-        //System.out.println("*DEST MOVE: " + newNode.getDestMove());
 
         sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoardConfig()));
 
-            //System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
-            //copyBoards.get(i).display();
-
-            //System.out.println("**VALID MOVES: " + newNode.getMoves());
-            //System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
-            
-            
-
-            //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
-
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
             
-            //System.out.println("**AFTER MOVE EXECUTION**");
-            //copyBoards.get(i).display();
-            //System.out.println(copyBoards.get(i).getHumPieces());
-            //System.out.println(copyBoards.get(i).getCompPieces());
-            //System.out.println("** CUR MOV BEING PASSED TO CONST (move executed): " + newNode.getMoves().get(i));
+          
 
             if(newNode.getDestMove() != null)
                 newNode.getMoves().get(i).setParent(newNode.getDestMove());
@@ -250,21 +216,13 @@ public class Node {
         Move move = new Move(1000000);
         //some arbitrary value
         Move move2 = new Move(0);
-        //System.out.println("**MOVE TO GET TO THIS NODE: " + newNode.getDestMove());
+        
 
         nodesTraversed++;
         newNode.setAsComp(false);
         newNode.generateMoves(newNode);
 
         depth++;
-        
-        //System.out.println("IS THIS NODE A COMPUTER? " + newNode.isComp +"" + newNode.player);
-
-        //System.out.println("**MIN V4 TERMINAL");
-        //System.out.println("TERMINAL?" + isCutOff(newNode, depth));
-        //System.out.println("**CUR DEPTH" + depth);
-        //System.out.println("RESULTING MOVES: ");
-        //System.out.println(newNode.getMoves());
 
         if(newNode.isCutOff(newNode, depth)) {
             newNode.setUtility(newNode.utility(newNode));
@@ -275,35 +233,18 @@ public class Node {
 
         }
 
-        //newNode.shallowSearch(newNode);
-        //System.out.println("**MIN");
-        //System.out.println("AI MOVES");
-        //System.out.println(newNode.getMoves());
-        //System.out.println("*DEST MOVE: " + newNode.getDestMove());
         sortMoves(newNode.getMoves());
         for(int i = 0; i < newNode.getMoves().size(); i++) {
             copyBoards.add(new Board(newNode.getBoardConfig()));
-            //System.out.println("**copy boards size**" + copyBoards.size() + "i: " + i);
-            //System.out.println("**COPY BOARD AT DEPTH " + depth +" BEFORE EXECUTION OF MOVE***");
-            //copyBoards.get(i).display();
-            //System.out.println("**VALID MOVES: " + newNode.getMoves());
-            //System.out.println("**PIECES OF THIS BOARD:" + newNode.getBoard().getHumPieces() + newNode.getBoard().getCompPieces());
-
-            
 
             copyBoards.get(i).executeMove(newNode.getMoves().get(i));
-            //System.out.println("**AFTER MOVE EXECUTION**");
-            //copyBoards.get(i).display();
-            //System.out.println(copyBoards.get(i).getHumPieces());
-            //System.out.println(copyBoards.get(i).getCompPieces());
             
-            //System.out.println("** CUR MOV BEING PASSED TO CONST (executed): " + newNode.getMoves().get(i));
 
             if(newNode.getDestMove() != null)
                 newNode.getMoves().get(i).setParent(newNode.getDestMove());
                 
             move2 = newNode.max_value(new Node(copyBoards.get(i), isComp, newNode.getMoves().get(i)), alpha, beta, depth);
-            //System.out.println("MOVE2: " + move2);
+           
             if(move2.getValue() < move.getValue()) {
                 move = new Move(move2);
 
@@ -390,11 +331,24 @@ public class Node {
 
     }
     */
+
+    /**
+     * This method is the heuristic evaluation function and the utility function for nodes at the 
+     * cut off depth or nodes that are leaf nodes.
+     * 
+     * @param newNode the node beign evaluated
+     * @return a heuristic value of the state, a higher value favors COMPUTER, a smaller value favors HUMAN the minimizer
+     */
     public double utility(Node newNode) {
+        //total value computed by eval function
         double utility;
+        //difference of piece score of COMPUTER and HUMAN feature
         double pieceDifference;
+        //center control feature
         double numCenter;
+        //back piece for king denial feature
         double numBackPieces;
+        //vulnerable pieces feature
         double numVulnerable;
 
 
@@ -409,6 +363,7 @@ public class Node {
             int compPieceScore = 0;
             int humanPieceScore = 0;
 
+            //compute piece score for computer with corresponding weights
             for(int i = 0; i < newNode.getBoardConfig().getCompPieces().size(); i++) {
                 if(newNode.getBoardConfig().getCompPieces().get(i).isKing())
                     compPieceScore += kingW;
@@ -416,6 +371,7 @@ public class Node {
 
             }
 
+            //compute piece score for human with corresponding weights
             for(int i = 0; i < newNode.getBoardConfig().getHumPieces().size(); i++) {
                 if(newNode.getBoardConfig().getHumPieces().get(i).isKing())
                     humanPieceScore += kingW;
@@ -427,13 +383,14 @@ public class Node {
 
 
             numCenter = 0;
-            //check center control
-            //https://www.youtube.com/watch?v=Lfo3yfrbUs0
-            //check key positions in back row (deny oponent from kings)
+            
+            
+            
             numBackPieces = 0;
             
             if(newNode.getDestMove().getPiece().getSide() == PlayerSide.COMPUTER) {
 
+                //compute for center control feature
                 for(int i = 3; i <= 4; i++) {
                     for(int j = 2; j <= 5; j++) {
                         if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) {
@@ -448,6 +405,7 @@ public class Node {
                     }
                 }
 
+                //compute for back pieces feature
                 if(newNode.getBoardConfig().getBoard()[0][1].getPiece() != null) 
                     if(newNode.getBoardConfig().getBoard()[0][1].getPiece().getSide() == PlayerSide.COMPUTER)
                         numBackPieces += normalW - 0.2;
@@ -456,7 +414,7 @@ public class Node {
                         numBackPieces += normalW - 0.2;
 
             } else {
-
+                //compute for center control feature
                 for(int i = 3; i <= 4; i++) {
                     for(int j = 2; j <= 5; j++) {
                         if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) {
@@ -474,6 +432,7 @@ public class Node {
                 //since HUMAN is minimizer, negative
                 numCenter *= -1;
 
+                //compute for back pieces feature
                 if(newNode.getBoardConfig().getBoard()[7][2].getPiece() != null) 
                     if(newNode.getBoardConfig().getBoard()[7][2].getPiece().getSide() == PlayerSide.HUMAN)
                         numBackPieces += normalW - 0.2;
@@ -485,7 +444,7 @@ public class Node {
             }
                     
                
-            //count vulnerable pieces in this state
+            //count vulnerable pieces in this state, based off of amount of generated jump movesd
             double j;
             numVulnerable = 0;
             for(int i = 0; i < newNode.getMoves().size(); i++) {
@@ -500,19 +459,7 @@ public class Node {
             if(newNode.getDestMove().getPiece().getSide() == PlayerSide.HUMAN)
                 numVulnerable *= -1;
 
-          
-
-
-
-            //to prevent AI putting too much weight on center control
-            //total center control is worth 1 pawn, and not 4 kings
-            
-
-
             utility = pieceDifference + numCenter + numBackPieces + numVulnerable;
-            //println("**UTILITY: " + utility);
-
-
             
         }
         return utility;
@@ -557,18 +504,8 @@ public class Node {
 
         ArrayList<Direction> jumpDirections = new ArrayList<Direction>();
 
-        //System.out.println("**BOARD IN GENERATE MOVES NODE METHOD**");
-        //newNode.getBoard().display();
-
-        //System.out.println(compPieces);
-        //System.out.println(humanPieces);
-       
-        //System.out.println(newNode.getMoves());
-    
-
         setDirections();
-        //System.out.println("BOARD BEFORE GENERATING MOVES: " );
-        //newNode.getBoard().display();
+        
 
         newNode.initPieces(humanPieces, compPieces, newNode);
 
@@ -578,17 +515,16 @@ public class Node {
 
         //double check if list of pieces is CORRECT.
 
-        //System.out.println("**PIECES IN ACTUAL BOARD OBJECT**");
         for(int i = 0; i < 8; i++) {
 
             for(int j = 0; j < 8; j++) {
                 if(newNode.getBoardConfig().getBoard()[i][j].getPiece() != null) {
-                    //System.out.println(newNode.getBoard().getBoard()[i][j].getPiece());
+                  
 
                     ind = humanPieces.indexOf(newNode.getBoardConfig().getBoard()[i][j].getPiece());
                     ind2 = compPieces.indexOf(newNode.getBoardConfig().getBoard()[i][j].getPiece());
 
-                    //System.out.println("VALUE OF INDICES: " + ind + ind2);
+                 
                     if(ind == -1 && ind2 == -1) {
                         humanPieces.remove(newNode.getBoardConfig().getBoard()[i][j].getPiece());
                     }
@@ -596,9 +532,6 @@ public class Node {
 
             }
         }
-
-        //System.out.println(compPieces);
-        //System.out.println(humanPieces);
 
             
 
@@ -622,12 +555,10 @@ public class Node {
                                 Board boardCopy = new Board(board);
 
 
-                                //System.out.println("*BOARD IN JUMPING PIECE*");
-                               // boardCopy.display();
-
+                              
                                 //keep a reference to jumping piece in copy boared for easy access
                                 jumpingPiece = boardCopy.getBoard()[humanPieces.get(i).getRow()][humanPieces.get(i).getCol()].getPiece(); 
-                                //System.out.println("**JUMPING PIECE!" + humanPieces.get(i));
+                            
                                 boardCopy.jumpMove(jumpingPiece, HUMAN_DIRECTIONS[j]);
 
                                 while(canJump) {
@@ -840,9 +771,7 @@ public class Node {
             /*Remove all non jumps, because a jump MUST be made if at least one jump is possible */
             if(jumpPossible == true) {
 
-                /*System.out.println("*IM INSIDE JUMPOS*");
-                System.out.println("SIZE OF ARRAYLISTS:" + humanMoves.size() + compMoves.size());
-                */
+               
                 if(newNode.player == PlayerSide.HUMAN) {
 
                     for(int h = 0; h < moves.size(); h++) {
@@ -865,13 +794,13 @@ public class Node {
 
             }
 
-            //System.out.println("BOARD AFTER!! GENERATING MOVES: " );
-            //newNode.getBoard().display();
-
-            //System.out.println("RESULTING MOVES: ");
-            //System.out.println(newNode.getMoves());
     }
-
+    /**
+     * This function implements basic move ordsreing my prioritizing capturing more pieces, and moves
+     * that lead to king transformation.
+     * 
+     * @param movesToSort the list of moves to sort
+     */
     public void sortMoves(ArrayList<Move> movesToSort) {
 
         int availIndex = 0;

@@ -1,6 +1,9 @@
 public class Square {
+    //if there is a piece, a reference to the Piece on the board
     private Piece piece;
+    //row position on board
     private int row;
+    //column position on board
     private int col;
 
     public Square(int row, int col, Piece piece) {
