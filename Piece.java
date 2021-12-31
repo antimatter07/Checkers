@@ -1,5 +1,17 @@
 public class Piece {
 
+    //allegiance of piece, either COMPUTER or HUMAN
+    private PlayerSide side;
+    //row position on board
+    private int row;
+    //col position on board
+    private int col;
+    //print this symbol for representing the piece on the board
+    private String symbol;
+    //false if this piece is not a king, true otherwise
+    private boolean isKing;
+
+
     
     /**
      * This constructor instantiates a piece given it's position in the board
@@ -67,13 +79,5 @@ public class Piece {
     public String toString() {
         return this.side + "ROW: " + row + " & COL: " + col;
     }
-
-
-    private PlayerSide side;
-    private int row;
-    private int col;
-    private String symbol;
-    private boolean isKing;
-
     
 }

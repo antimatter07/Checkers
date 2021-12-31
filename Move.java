@@ -1,13 +1,25 @@
 import java.util.*;
 public class Move {
+
+    //directions this move contains, can contain UPRIGHT, UPLEFT, DOWNLEFT, DOWNRIGHT
     private ArrayList<Direction> directionMoves;
+
+    //type of move represented as an enum that can be JUMP (includes MULTIPLE JUMP) or STANDARD
     private MoveType type;
+
+    //reference to the piece being moved
     private Piece movePiece;
+
+    //value if it is evaluated by the utility function
     private double value;
+
+    //parent move to get to this move
     private Move parent;
+
+    //true if this will lead to the piece transforming to a king, false otherwise
     private boolean transformToKing = false;
 
-    private ArrayList<Move> destMoves;
+    
 
     public Move(MoveType type, Direction d, Piece movePiece) {
         this.type = type;
@@ -195,5 +207,7 @@ public class Move {
     public ArrayList<Move> getDestMoves() {
         return destMoves;
     }
+
+    private ArrayList<Move> destMoves;
     
 }
