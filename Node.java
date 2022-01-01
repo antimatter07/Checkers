@@ -445,7 +445,7 @@ public class Node {
                 if(newNode.getBoardConfig().getBoard()[7][6].getPiece() != null) 
                     if(newNode.getBoardConfig().getBoard()[7][6].getPiece().getSide() == PlayerSide.HUMAN)
                         numBackPieces += normalW - 0.2;
-
+                //invert sign, since human is MINIMIZER
                 numBackPieces *= -1;
             }
                     
