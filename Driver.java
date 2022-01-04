@@ -328,7 +328,7 @@ public class Driver {
                         
                     }
                     
-                    System.out.println("*AI's choice: " + comp+ "UTIL: " + comp.getValue());
+                    System.out.println("*AI's choice: " + comp);
                     
                     
                     board.executeMove(comp);

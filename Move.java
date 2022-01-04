@@ -175,7 +175,7 @@ public class Move {
     @Override
     public String toString() {
         return movePiece.getSide() + " on pos " + movePiece.getRow() + 
-        " " + movePiece.getCol() + directionMoves.toString() +" UTILITY: " + this.value; 
+        " " + movePiece.getCol() + directionMoves.toString(); 
     }
 
     @Override
